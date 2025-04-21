@@ -2,7 +2,7 @@
 var button = document.getElementById('startButton')
 var svgElement = document.getElementById('gameSVG')
 var svgNS = "http://www.w3.org/2000/svg";
-var cardScale = 0.35
+var cardScale = 0.4
 var cardSpacing = 100;
 const placeHolderIMG = '../imgs/placeholder.png';
 const cardFolder = '../imgs/cards/';
@@ -12,8 +12,8 @@ var mouseX = 0;
 var mouseY = 0
 var lastY = 0;
 var lastX = 0;
-var scaleX = 0.35;
-var scaleY = 0.35;
+var scaleX = 0.4;
+var scaleY = 0.4;
 var holder = null;
 function generateGame() {
     button.remove();
@@ -64,7 +64,7 @@ function testAddCard(color, suit, number, dest) {
         lastY = holdG.parentNode.parentNode.getCTM().f
         lastX = holdG.parentNode.parentNode.getCTM().e
         holdG.parentNode.removeChild(holdG);
-        scale(holdG, 0.35, 0.35)
+        scale(holdG, scaleX, scaleY)
         holder.parentNode.parentNode.appendChild(holdG)
 
         moveToMouse(event, scaleX, scaleY, img)
@@ -112,7 +112,7 @@ function scale(element, X, Y) {
     element.setAttribute('transform', `scale(${X},${Y})`)
 }
 function unScale(element, index) {
-    let offset = (36 / scaleX) * (index - 1) //offset y by a third of card size scaled to match card scale and get the index - base
+    let offset = (31 / scaleX) * (index - 1) //offset y by a fourth of card size scaled to match card scale and get the index - base
     element.setAttribute('transform', `translate (0,${offset})scale(1,1)`)
     element.firstChild.removeAttribute('transform');
 
