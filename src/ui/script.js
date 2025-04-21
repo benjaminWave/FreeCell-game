@@ -55,6 +55,7 @@ function testAddCard(color, suit, number, dest) {
     holder = document.getElementById(`tableauAreapos${dest}`)
     var intendedCard = cardFolder + color + suit + number + ".png"
     var holdG = document.createElementNS(svgNS, 'g');
+    holdG.setAttribute('id', color + suit + number + 'Holder')
     var img = document.createElementNS(svgNS, 'image');
     img.setAttribute('href', intendedCard);
     holdG.appendChild(img);
@@ -131,7 +132,7 @@ function unScale(element, index) {
 
 function moveToMouse(event, element) {
     let x = event.clientX - 37
-    let y = event.clientY - 105
+    let y = event.clientY - 85
     element.setAttribute('transform', `translate(${x}, ${y})`); // previously x/scaleX
 }
 function findClosestElement(element, parent, X, Y) {
