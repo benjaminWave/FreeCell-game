@@ -67,9 +67,17 @@ function testAddCard(color, suit, number, dest) {
         var mover = document.getElementById('mover');
         isDragging = true;
         draggedCard = holdG
-        holdG.parentNode.removeChild(holdG);
-        scale(holdG, scaleX, scaleY)
-        mover.appendChild(holdG)
+        let parent = holdG.parentNode
+        let index = (Array.prototype.indexOf.call(parent.children, holdG));
+        let tempArr = collectCards(parent, index)
+        for (var i = 0; i < tempArr.length; i++) {
+            var currentCard = tempArr[i];
+            parent.removeChild(currentCard);
+            scale(currentCard, scaleX, scaleY, i)
+            mover.appendChild(currentCard);
+        }
+
+
 
         moveToMouse(event, mover)
         mouseX = event.clientX
@@ -94,6 +102,14 @@ function testAddCard(color, suit, number, dest) {
     });*/
 }
 
+function collectCards(element, start) {
+    let tempArr = [];
+    for (var i = start; i < element.children.length; i++) {
+        var currentCard = element.children[i];
+        tempArr.push(currentCard)
+    }
+    return tempArr;
+}
 function handleMouseMove(event) {
     if (draggedCard) {
         var mover = document.getElementById('mover');
@@ -105,15 +121,22 @@ function handleMouseMove(event) {
 
 function handleMouseUp(event) {
     if (draggedCard) {
+        var mover = document.getElementById('mover');
         holder = findClosestElement(draggedCard, holder, mouseX, mouseY)
-        holder.appendChild(draggedCard);
-        unScale(draggedCard, holder.children.length - 1);
+        let tempArr = collectCards(mover, 0)
+        for (var i = 0; i < tempArr.length; i++) {
+            let currentCard = tempArr[i];
+            holder.appendChild(currentCard);
+            unScale(currentCard, holder.children.length - 1);
+        }
+
         draggedCard = null;
     }
 }
 
-function scale(element, X, Y) {
-    element.setAttribute('transform', `scale(${X},${Y})`)
+function scale(element, X, Y, index) {
+    let offset = (31) * (index - 1)
+    element.setAttribute('transform', `translate (0,${offset})scale(${X},${Y})`)
 }
 function unScale(element, index) {
     let offset = (31 / scaleX) * (index - 1) //offset y by a fourth of card size scaled to match card scale and get the index - base
@@ -125,7 +148,7 @@ function unScale(element, index) {
 function moveToMouse(event, element) {
     let x = event.clientX - 37
     let y = event.clientY - 105
-    element.setAttribute('transform', `translate(${x}, ${y })`); // previously x/scaleX
+    element.setAttribute('transform', `translate(${x}, ${y})`); // previously x/scaleX
 }
 function findClosestElement(element, parent, X, Y) {
     const sections = document.getElementsByClassName('section');
