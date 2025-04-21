@@ -6,6 +6,15 @@ var cardScale = 0.35
 var cardSpacing = 100;
 const placeHolderIMG = '../imgs/placeholder.png';
 const cardFolder = '../imgs/cards/';
+var draggedCard = null;
+
+var mouseX = 0;
+var mouseY = 0
+var lastY = 0;
+var lastX = 0;
+var scaleX = 0.35;
+var scaleY = 0.35;
+var holder = null;
 function generateGame() {
     button.remove();
     //ADD FUNCTION TO CLEAR THE BOARD
@@ -13,7 +22,8 @@ function generateGame() {
     createSection('freeCell', 4, 0, 0);
     createSection('foundCell', 4, cardSpacing * 4.5, 0);
     createSection('tableauArea', 8, 25, 145);
-    testAddCard();
+    testAddCard('RED', 'HEARTS', 'ACE', 1);
+    testAddCard('BLACK', 'CLUBS', 'TWO', 3);
 }
 function createSection(tag, size, offsetX, offsetY) {
     var mainG = document.createElementNS(svgNS, 'g')
@@ -36,23 +46,21 @@ function createSection(tag, size, offsetX, offsetY) {
 
 }
 
-function testAddCard() {
-    var holder = document.getElementById('tableauAreapos1')
-    var intendedCard = cardFolder + "BLACKCLUBSACE.png"
+function testAddCard(color, suit, number, dest) {
+    holder = document.getElementById(`tableauAreapos${dest}`)
+    var intendedCard = cardFolder + color + suit + number + ".png"
     var holdG = document.createElementNS(svgNS, 'g');
     var img = document.createElementNS(svgNS, 'image');
-    var mouseX = 0;
-    var mouseY = 0
-    var lastY = 0;
-    var lastX = 0;
     img.setAttribute('href', intendedCard);
     holdG.appendChild(img);
     holder.appendChild(holdG);
     let isDragging = false;
-    var scaleX = holder.getCTM().a;
-    var scaleY = holder.getCTM().d;
+    scaleX = holder.getCTM().a;
+    scaleY = holder.getCTM().d;
+    ///INPUT BEGIN
     holdG.addEventListener('mousedown', (event) => {
         isDragging = true;
+        draggedCard = holdG
         lastY = holdG.parentNode.parentNode.getCTM().f
         lastX = holdG.parentNode.parentNode.getCTM().e
         holdG.parentNode.removeChild(holdG);
@@ -64,6 +72,7 @@ function testAddCard() {
         mouseY = event.clientY
 
     });
+    /*//INPUT OVER
     document.addEventListener('mouseup', (event) => {
         isDragging = false;
         holder = findClosestElement(holdG, holder, mouseX, mouseY)
@@ -78,7 +87,25 @@ function testAddCard() {
             mouseX = event.clientX
             mouseY = event.clientY
         }
-    });
+    });*/
+}
+
+function handleMouseMove(event) {
+    if (draggedCard) {
+        var img = draggedCard.querySelector('image');
+        moveToMouse(event, scaleX, scaleY, img)
+        mouseX = event.clientX
+        mouseY = event.clientY
+    }
+}
+
+function handleMouseUp(event) {
+    if (draggedCard) {
+        holder = findClosestElement(draggedCard, holder, mouseX, mouseY)
+        holder.appendChild(draggedCard);
+        unScale(draggedCard);
+        draggedCard = null;
+    }
 }
 
 function scale(element, X, Y) {
@@ -113,4 +140,5 @@ function isOverlapping(e1, X, Y) {
 }
 
 button.addEventListener("click", generateGame);
-
+document.addEventListener('mousemove', handleMouseMove);
+document.addEventListener('mouseup', handleMouseUp);
