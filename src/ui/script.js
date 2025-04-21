@@ -10,8 +10,7 @@ var draggedCard = null;
 
 var mouseX = 0;
 var mouseY = 0
-var lastY = 0;
-var lastX = 0;
+
 var scaleX = 0.4;
 var scaleY = 0.4;
 var holder = null;
@@ -22,6 +21,7 @@ function generateGame() {
     createSection('freeCell', 4, 0, 0);
     createSection('foundCell', 4, cardSpacing * 4.5, 0);
     createSection('tableauArea', 8, 25, 145);
+    createMover()
     testAddCard('RED', 'HEARTS', 'ACE', 1);
     testAddCard('BLACK', 'CLUBS', 'TWO', 3);
 }
@@ -45,6 +45,11 @@ function createSection(tag, size, offsetX, offsetY) {
     }
 
 }
+function createMover() {
+    var mainG = document.createElementNS(svgNS, 'g')
+    mainG.setAttribute('id', 'mover');
+    svgElement.appendChild(mainG);
+}
 
 function testAddCard(color, suit, number, dest) {
     holder = document.getElementById(`tableauAreapos${dest}`)
@@ -59,15 +64,14 @@ function testAddCard(color, suit, number, dest) {
     scaleY = holder.getCTM().d;
     ///INPUT BEGIN
     holdG.addEventListener('mousedown', (event) => {
+        var mover = document.getElementById('mover');
         isDragging = true;
         draggedCard = holdG
-        lastY = holdG.parentNode.parentNode.getCTM().f
-        lastX = holdG.parentNode.parentNode.getCTM().e
         holdG.parentNode.removeChild(holdG);
         scale(holdG, scaleX, scaleY)
-        holder.parentNode.parentNode.appendChild(holdG)
+        mover.appendChild(holdG)
 
-        moveToMouse(event, scaleX, scaleY, img)
+        moveToMouse(event, mover)
         mouseX = event.clientX
         mouseY = event.clientY
 
@@ -92,8 +96,8 @@ function testAddCard(color, suit, number, dest) {
 
 function handleMouseMove(event) {
     if (draggedCard) {
-        var img = draggedCard.querySelector('image');
-        moveToMouse(event, scaleX, scaleY, img)
+        var mover = document.getElementById('mover');
+        moveToMouse(event, mover)
         mouseX = event.clientX
         mouseY = event.clientY
     }
@@ -118,17 +122,18 @@ function unScale(element, index) {
 
 }
 
-function moveToMouse(event, scaleX, scaleY, img) {
+function moveToMouse(event, element) {
     let x = event.clientX - 37
     let y = event.clientY - 105
-    img.setAttribute('transform', `translate(${x / scaleX}, ${y / scaleY})`);
+    element.setAttribute('transform', `translate(${x}, ${y })`); // previously x/scaleX
 }
 function findClosestElement(element, parent, X, Y) {
     const sections = document.getElementsByClassName('section');
 
-    for (var i = 0; i < 16; i++) {
-        //FIX THIS FOR STACKED SECTIONS
-        if (isOverlapping(sections[i], X, Y)) {
+    for (var i = 0; i < 16; i++) { //16 spots in the game, for future reference
+        //TEST THIS FOR STACKED SECTIONS
+        let topIndex = sections[i].children.length - 1
+        if (isOverlapping(sections[i].children[topIndex], X, Y)) {
             return sections[i];
         }
     }
