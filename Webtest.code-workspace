@@ -1,0 +1,17 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "../../../Downloads/my-app/src/main/frontend"
+		},
+		{
+			"path": "../../../Downloads/my-app/src/main/java"
+		},
+		{
+			"path": "../../../Downloads/my-app/src/main/resources"
+		}
+	],
+    "settings": {}
+}

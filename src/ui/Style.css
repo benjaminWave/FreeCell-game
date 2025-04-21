@@ -1,0 +1,32 @@
+body {
+    background-color: white;
+}
+
+h1 {
+    color: red;
+    text-align: left;
+}
+
+
+.container {
+  
+    height: 570px;
+    width: 1300px;
+    margin: auto;
+    background-image: url('../imgs/background.png');
+}
+
+.startButton{
+    padding: 10px 10px;
+    font-size: 16px;
+    margin-top: 60px;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+    color: #424141;
+    background-color: #ffffff; 
+}
+.startButton:hover {
+    background-color: #04AA6D; 
+    color: white;
+  }

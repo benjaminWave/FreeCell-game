@@ -1,0 +1,9 @@
+  <g transform="translate (55,15)" id=freeCell>
+                <g  transform="scale(0.35,.35)" id='pos1'>
+                    <image href='../imgs/placeholder.png'>
+                </g>
+
+                <g transform="translate (100,0) scale(0.35,.35)" id='pos2'>
+                    <image href='../imgs/placeholder.png'>
+                </g>
+            </g>
