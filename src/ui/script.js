@@ -103,7 +103,7 @@ function handleMouseUp(event) {
     if (draggedCard) {
         holder = findClosestElement(draggedCard, holder, mouseX, mouseY)
         holder.appendChild(draggedCard);
-        unScale(draggedCard);
+        unScale(draggedCard, holder.children.length - 1);
         draggedCard = null;
     }
 }
@@ -111,8 +111,9 @@ function handleMouseUp(event) {
 function scale(element, X, Y) {
     element.setAttribute('transform', `scale(${X},${Y})`)
 }
-function unScale(element) {
-    element.setAttribute('transform', `scale(1,1)`)
+function unScale(element, index) {
+    let offset = (36 / scaleX) * (index - 1) //offset y by a third of card size scaled to match card scale and get the index - base
+    element.setAttribute('transform', `translate (0,${offset})scale(1,1)`)
     element.firstChild.removeAttribute('transform');
 
 }

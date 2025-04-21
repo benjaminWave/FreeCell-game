@@ -39,8 +39,8 @@ function generateCard(color, suit, number) {
 
     var textElement = document.createElementNS(svgNS, "text");
     textElement.setAttribute("x", 25);
-    textElement.setAttribute("y", 35);
-    textElement.setAttribute("font-size", "50");
+    textElement.setAttribute("y", 25);
+    textElement.setAttribute("font-size", "37");
     textElement.setAttribute("fill", color);
     textElement.setAttribute("text-anchor", "middle");
     textElement.setAttribute("dominant-baseline", "central");
@@ -49,8 +49,8 @@ function generateCard(color, suit, number) {
 
     textElement = document.createElementNS(svgNS, "text");
     textElement.setAttribute("x", 175);
-    textElement.setAttribute("y", 265);
-    textElement.setAttribute("font-size", "50");
+    textElement.setAttribute("y", 255);
+    textElement.setAttribute("font-size", "37");
     textElement.setAttribute("fill", color);
     textElement.setAttribute("text-anchor", "middle");
     textElement.setAttribute("dominant-baseline", "central");
@@ -69,7 +69,7 @@ function generateCard(color, suit, number) {
 
 
     tempGElement = document.createElementNS(svgNS, 'g');
-    tempGElement.setAttribute("transform", "translate(7,103)scale(0.0250000,-0.0250000)");
+    tempGElement.setAttribute("transform", "translate(14,73)scale(0.0150000,-0.0150000)");
     pathElement = document.createElementNS(svgNS, 'path');
     pathElement.setAttribute('fill', color);
     pathElement.setAttribute('d', paths[suit]);
@@ -78,7 +78,7 @@ function generateCard(color, suit, number) {
 
 
     tempGElement = document.createElementNS(svgNS, 'g');
-    tempGElement.setAttribute("transform", "translate(165,195)scale(0.0250000,0.0250000)");
+    tempGElement.setAttribute("transform", "translate(172,225)scale(0.0150000,0.0150000)");
     pathElement = document.createElementNS(svgNS, 'path');
     pathElement.setAttribute('fill', color);
     pathElement.setAttribute('d', paths[suit]);
