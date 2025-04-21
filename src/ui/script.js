@@ -84,22 +84,6 @@ function testAddCard(color, suit, number, dest) {
         mouseY = event.clientY
 
     });
-    /*//INPUT OVER
-    document.addEventListener('mouseup', (event) => {
-        isDragging = false;
-        holder = findClosestElement(holdG, holder, mouseX, mouseY)
-        holder.appendChild(holdG);
-        unScale(holdG);
-
-
-    })
-    document.addEventListener('mousemove', (event) => {
-        if (isDragging) {
-            moveToMouse(event, scaleX, scaleY, img)
-            mouseX = event.clientX
-            mouseY = event.clientY
-        }
-    });*/
 }
 
 function collectCards(element, start) {
