@@ -25,6 +25,7 @@ function generateGame() {
     createMover()
     testAddCard('RED', 'HEARTS', 'ACE', 1);
     testAddCard('BLACK', 'CLUBS', 'TWO', 3);
+    testAddCard('RED', 'DIAMONDS', 'JACK', 7);
 }
 function createSection(tag, size, offsetX, offsetY) {
     var mainG = document.createElementNS(svgNS, 'g')
