@@ -115,7 +115,6 @@ function handleMouseUp(event) {
         holder = findClosestElement(draggedCard, holder, mouseX, mouseY)
         let offset = (31) * (holder.children.length - 1)
         animateMover(mover.getCTM().e, holder.getBoundingClientRect().x - 8, mover.getCTM().f, holder.getBoundingClientRect().y - 19 + offset, mover)
-
         draggedCard = null;
     }
 }
@@ -128,15 +127,11 @@ function animateMover(sX, eX, sY, eY, element) {
     function update() {
         let currentTime = performance.now();
         t = (currentTime - startTime) / duration;
-        if (t > 1) {
+        if (t >= 1) {
             t = 1;
             isMoving = false
-            let tempArr = collectCards(mover, 0)
-            for (var i = 0; i < tempArr.length; i++) {
-                let currentCard = tempArr[i];
-                holder.appendChild(currentCard);
-                unScale(currentCard, holder.children.length - 1);
-            }
+            console.log('YES')
+            transportCards(mover)
         }
         let x = lerp(sX, eX, t);
         let y = lerp(sY, eY, t);
@@ -145,7 +140,14 @@ function animateMover(sX, eX, sY, eY, element) {
     }
     requestAnimationFrame(update);
 }
-
+function transportCards(mover) {
+    let tempArr = collectCards(mover, 0)
+    for (var i = 0; i < tempArr.length; i++) {
+        let currentCard = tempArr[i];
+        holder.appendChild(currentCard);
+        unScale(currentCard, holder.children.length - 1);
+    }
+}
 function scale(element, X, Y, index) {
     let offset = (31) * (index - 1)
     element.setAttribute('transform', `translate (0,${offset})scale(${X},${Y})`)
