@@ -131,7 +131,6 @@ function animateMover(sX, eX, sY, eY, element) {
         if (t >= 1) {
             t = 1;
             isMoving = false
-            console.log('YES')
             transportCards(mover)
         }
         let x = lerp(sX, eX, t);
