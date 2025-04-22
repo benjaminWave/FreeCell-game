@@ -14,6 +14,7 @@ var mouseY = 0
 var scaleX = 0.4;
 var scaleY = 0.4;
 var holder = null;
+var isMoving = false;
 function generateGame() {
     button.remove();
     //ADD FUNCTION TO CLEAR THE BOARD
@@ -56,6 +57,7 @@ function testAddCard(color, suit, number, dest) {
     var intendedCard = cardFolder + color + suit + number + ".png"
     var holdG = document.createElementNS(svgNS, 'g');
     holdG.setAttribute('id', color + suit + number + 'Holder')
+    holdG.setAttribute('class', 'cardObject')
     var img = document.createElementNS(svgNS, 'image');
     img.setAttribute('href', intendedCard);
     holdG.appendChild(img);
@@ -65,6 +67,8 @@ function testAddCard(color, suit, number, dest) {
     scaleY = holder.getCTM().d;
     ///INPUT BEGIN
     holdG.addEventListener('mousedown', (event) => {
+        if (isMoving) return;
+        holder = holdG.parentNode
         var mover = document.getElementById('mover');
         isDragging = true;
         draggedCard = holdG
@@ -77,14 +81,14 @@ function testAddCard(color, suit, number, dest) {
             scale(currentCard, scaleX, scaleY, i)
             mover.appendChild(currentCard);
         }
-
-
-
         moveToMouse(event, mover)
         mouseX = event.clientX
         mouseY = event.clientY
 
     });
+}
+function lerp(a, b, t) {
+    return a + (b - a) * t;
 }
 
 function collectCards(element, start) {
@@ -106,17 +110,40 @@ function handleMouseMove(event) {
 
 function handleMouseUp(event) {
     if (draggedCard) {
+        isMoving = true
         var mover = document.getElementById('mover');
         holder = findClosestElement(draggedCard, holder, mouseX, mouseY)
-        let tempArr = collectCards(mover, 0)
-        for (var i = 0; i < tempArr.length; i++) {
-            let currentCard = tempArr[i];
-            holder.appendChild(currentCard);
-            unScale(currentCard, holder.children.length - 1);
-        }
+        let offset = (31) * (holder.children.length - 1)
+        animateMover(mover.getCTM().e, holder.getBoundingClientRect().x - 8, mover.getCTM().f, holder.getBoundingClientRect().y - 19 + offset, mover)
 
         draggedCard = null;
     }
+}
+
+function animateMover(sX, eX, sY, eY, element) {
+    var t = 0;
+    var duration = 100;
+    let startTime = performance.now();
+
+    function update() {
+        let currentTime = performance.now();
+        t = (currentTime - startTime) / duration;
+        if (t > 1) {
+            t = 1;
+            isMoving = false
+            let tempArr = collectCards(mover, 0)
+            for (var i = 0; i < tempArr.length; i++) {
+                let currentCard = tempArr[i];
+                holder.appendChild(currentCard);
+                unScale(currentCard, holder.children.length - 1);
+            }
+        }
+        let x = lerp(sX, eX, t);
+        let y = lerp(sY, eY, t);
+        element.setAttribute('transform', `translate(${x},${y})`);
+        if (t < 1) requestAnimationFrame(update);
+    }
+    requestAnimationFrame(update);
 }
 
 function scale(element, X, Y, index) {
@@ -125,6 +152,7 @@ function scale(element, X, Y, index) {
 }
 function unScale(element, index) {
     let offset = (31 / scaleX) * (index - 1) //offset y by a fourth of card size scaled to match card scale and get the index - base
+
     element.setAttribute('transform', `translate (0,${offset})scale(1,1)`)
     element.firstChild.removeAttribute('transform');
 
