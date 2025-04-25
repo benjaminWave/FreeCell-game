@@ -12,12 +12,12 @@ var CardConverter = /** @class */ (function () {
             current++;
         }
         current = 0;
-        for (var suit in Object.values(Suit_1.Suit)) {
+        for (var suit in  Object.keys(Suit_1.Suit).filter(x => isNaN(Number(x)))) {
             if (current % 2 == 0) {
-                CardConverter.map2.set(suit, Color_1.Color.RED);
+                CardConverter.map2.set(Suit_1.Suit[suit], Color_1.Color.RED);
             }
             else {
-                CardConverter.map2.set(suit, Color_1.Color.BLACK);
+                CardConverter.map2.set(Suit_1.Suit[suit], Color_1.Color.BLACK);
             }
             current++;
         }
@@ -26,10 +26,14 @@ var CardConverter = /** @class */ (function () {
         return CardConverter.CONVERTER;
     };
     CardConverter.toNumber = function (num) {
-        return CardConverter.map.get(num);
+        //return CardConverter.map.get(num);
+        return CardNumber_1.CardNumber[num];
     };
     CardConverter.toColor = function (suit) {
-        return CardConverter.map2.get(suit);
+        //return CardConverter.map2.get(suit);
+        if (suit === 'DIAMONDS'|| suit ==='HEARTS')
+            return "RED";
+        return "BLACK";
     };
     CardConverter.map = new Map();
     CardConverter.map2 = new Map();

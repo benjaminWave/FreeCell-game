@@ -48,10 +48,10 @@ var Card = /** @class */ (function (_super) {
     Card.prototype.getHead = function () {
         return this;
     };
-    Card.prototype.toString = function () {
-        return "Card is: " + this.getColor().toString() + this.num.toString() + this.suit.toString()
-            + "at Position: " + this.position.getX() + " " + this.position.getY();
-    };
+    //Card.prototype.toString = function () {
+    //    return "Card is: " + this.getColor().toString() + this.num.toString() + this.suit.toString()
+     //       + "at Position: " + this.position.getX() + " " + this.position.getY();
+    //};
     return Card;
 }(Component_1.Component));
 exports.Card = Card;

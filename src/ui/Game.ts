@@ -20,13 +20,13 @@ export class Game {
     }
 
     private setUp(): void {
-        this.tableaus = new Tableau[Game.TABLEAU_SIZE];
-        this.cards = new Card[Game.DECK_SIZE];
+        this.tableaus = new Array(Game.TABLEAU_SIZE);
+        this.cards = new Array(Game.DECK_SIZE);
         this.cascades = new Array();
         this.createTableaus();
         this.createCards();
         this.shuffle();
-        this.checkForCascades();
+        //this.checkForCascades();
     }
     private createTableaus(): void {
         for (var i = 1; i <= Game.TABLEAU_SIZE; i++) {
@@ -36,9 +36,11 @@ export class Game {
     private createCards(): void {
         var currentNumber: number = 0;
         var suit: any;
-        for (suit in Suit) {
+        var suitList = Object.keys(Suit).filter(x => isNaN(Number(x)));
+        var numberList = Object.keys(CardNumber).filter(x => isNaN(Number(x)));
+        for (suit in suitList) {
             var cardNumber: any;
-            for (cardNumber in CardNumber) {
+            for (cardNumber in numberList) {
                 let createdCard: Card = new Card(CardConverter.toColor(suit), suit,
                     new Vector2(0, 0), cardNumber);
                 this.cards[currentNumber] = createdCard;
@@ -61,13 +63,15 @@ export class Game {
             var tab: Tableau = this.tableaus[i];
             var offset = 1 - (i / 4);
             var maxSize = Game.MAX_TABLEAU_SIZE + offset;
+            var currentSize = 0
             for (var j = 0; j < maxSize; j++) {
                 // if (numbers.size() > 0) {
                 let num = Math.floor(Math.random() * (numbers.length + 1));
                 //numbers.remove(num);
                 numbers = [...numbers.slice(0, num), ...numbers.slice(
                     num + 1)];
-                this.cards[num].setPosition(new Vector2(tab.getNumber(), tab.size()));
+                this.cards[num].setPosition(new Vector2(i+1, currentSize));
+                currentSize++;
                 tab.add(this.cards[num]);
 
                 // }
@@ -77,10 +81,10 @@ export class Game {
     }
 
     public update(): void {
-        this.checkForCascades();
+       // this.checkForCascades();
     }
 
-    private checkForCascades(): void {
+    /*private checkForCascades(): void {
         var tab: any;
         for (tab in this.tableaus) {
             var canCreate = true;
@@ -128,7 +132,7 @@ export class Game {
         }
         // System.out.println("TEST");
         // System.out.println("TEST");
-    }
+    }*/
 
 
 }
