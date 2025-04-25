@@ -22,10 +22,28 @@ function generateGame() {
     createSection('freeCell', 4, 0, 0);
     createSection('foundCell', 4, cardSpacing * 4.5, 0);
     createSection('tableauArea', 8, 25, 145);
-    createMover()
-    testAddCard('RED', 'HEARTS', 'ACE', 1);
-    testAddCard('BLACK', 'CLUBS', 'TWO', 3);
-    testAddCard('RED', 'DIAMONDS', 'JACK', 7);
+    createMover();
+    startGame();
+    // testAddCard('RED', 'HEARTS', 'ACE', 1);
+    //testAddCard('BLACK', 'CLUBS', 'TWO', 3);
+    //testAddCard('RED', 'DIAMONDS', 'JACK', 7);
+}
+async function startGame() {
+    const response = await fetch('http://localhost:3500/game/start', {
+        method: 'GET',
+
+    });
+    const responseData = await response.json();
+    const game = responseData.object;
+    const tableaus = game.tableaus
+    for (var i = 0; i < tableaus.length; i++) {
+        const cards = tableaus[i].cards;
+        for (var j = 0; j < cards.length; j++) {
+            let pos = i + 1;
+            let card = cards[j];
+            addCard(card.color, card.suit, card.num, pos);
+        }
+    }
 }
 function createSection(tag, size, offsetX, offsetY) {
     var mainG = document.createElementNS(svgNS, 'g')
@@ -53,7 +71,7 @@ function createMover() {
     svgElement.appendChild(mainG);
 }
 
-function testAddCard(color, suit, number, dest) {
+function addCard(color, suit, number, dest) {
     holder = document.getElementById(`tableauAreapos${dest}`)
     var intendedCard = cardFolder + color + suit + number + ".png"
     var holdG = document.createElementNS(svgNS, 'g');
@@ -62,7 +80,10 @@ function testAddCard(color, suit, number, dest) {
     var img = document.createElementNS(svgNS, 'image');
     img.setAttribute('href', intendedCard);
     holdG.appendChild(img);
-    holder.appendChild(holdG);
+    scale(holdG, scaleX, scaleY, 0)
+    mover.appendChild(holdG);
+    transportCards(mover);
+    
     let isDragging = false;
     scaleX = holder.getCTM().a;
     scaleY = holder.getCTM().d;
@@ -145,17 +166,17 @@ function transportCards(mover) {
     for (var i = 0; i < tempArr.length; i++) {
         let currentCard = tempArr[i];
         holder.appendChild(currentCard);
-        unScale(currentCard, holder.children.length - 1);
+        unScale(currentCard, holder.children.length - 1, true);
     }
 }
 function scale(element, X, Y, index) {
     let offset = (31) * (index - 1)
     element.setAttribute('transform', `translate (0,${offset})scale(${X},${Y})`)
 }
-function unScale(element, index) {
+function unScale(element, index, cond) {
     let offset = (31 / scaleX) * (index - 1) //offset y by a fourth of card size scaled to match card scale and get the index - base
 
-    element.setAttribute('transform', `translate (0,${offset})scale(1,1)`)
+    element.setAttribute('transform', `translate (0,${offset})scale(1,1)`);
     element.firstChild.removeAttribute('transform');
 
 }
