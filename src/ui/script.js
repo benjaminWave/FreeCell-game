@@ -69,6 +69,7 @@ function createSection(tag, size, offsetX, offsetY) {
     for (var i = 1; i <= size; i++) {
         var newG = document.createElementNS(svgNS, 'g');
         newG.setAttribute('id', tag + 'pos' + i);
+        newG.setAttribute('pos', i);
         newG.setAttribute('class', 'section')
         newG.setAttribute('transform', `translate (${cardSpacing * (i - 1)},0) scale(${cardScale},${cardScale})`);
         var img = document.createElementNS(svgNS, 'image');
@@ -103,8 +104,11 @@ function addCard(color, suit, number, dest) {
     ///INPUT BEGIN
     holdG.addEventListener('mousedown', (event) => {
         if (isMoving) return;
-        if (!canSelect()) return;
+
         holder = holdG.parentNode
+        var cardObj = { 'color': color, 'type': suit, 'num': number };
+        var result = controller.canSelect(cardObj, holder.getAttribute('pos'), Array.from(holder.children).indexOf(holdG), "tableauArea");
+        if (!result) return;
         var mover = document.getElementById('mover');
         isDragging = true;
         draggedCard = holdG
@@ -124,9 +128,7 @@ function addCard(color, suit, number, dest) {
     });
 }
 
-function canSelect() {
-    return false;
-}
+
 function lerp(a, b, t) {
     return a + (b - a) * t;
 }

@@ -33,7 +33,6 @@ export class Game {
                 let createdCard = new Card(CardConverter.toColor(Suit[suit]), Suit[suit], new Vector2(0, 0), CardNumber[cardNumber]);
                 this.cards[currentNumber] = createdCard;
                 currentNumber++;
-                // System.out.println(createdCard.toString());
             }
         }
     }
@@ -52,8 +51,7 @@ export class Game {
             var maxSize = Game.MAX_TABLEAU_SIZE + offset;
             var currentSize = 0;
             for (var j = 0; j < maxSize; j++) {
-                var num = Math.floor(Math.random() * (numbers.length-1));
-                //console.log(numbers[num]);
+                var num = Math.floor(Math.random() * (numbers.length - 1));
                 this.cards[numbers[num]].setPosition(new Vector2(i + 1, currentSize));
                 tab.add(this.cards[numbers[num]]);
                 numbers = [...numbers.slice(0, num), ...numbers.slice(num + 1)];
@@ -63,6 +61,40 @@ export class Game {
     }
     update() {
         // this.checkForCascades();
+    }
+
+    canSelect(card, posX, posY, section) {
+        if (section != "tableauArea") return true;
+        return this.isCascade(this.tableaus[posX - 1], card, posX, posY);
+    }
+    getIndex(array, card) {
+
+        for (var i = 0; i < array.length; i++) {
+
+            if (this.cardEquals(array[i], card)) return i;
+        }
+        return -1;
+    }
+    cardEquals(card1, card2) {
+        return card1.num === card2.num && card1.suit === card2.suit //&& card1.position.getX() === card2.position.getX() && card1.position.getY() === card2.position.getY();
+    }
+    isCascade(tab, card, posX, posY) {
+        card = new Card(card['color'], card['type'], new Vector2(posX, posY), card['num']);
+        var index = this.getIndex(tab.cards, card);
+        if (index === -1) return false;
+        var cards = tab.cards;
+        var desiredColor = card.color;
+        var desiredNumber = CardConverter.toNumber(card.num);
+        for (var i = index + 1; i < cards.length; i++) {
+            let thisColor = cards[i].color;
+            let thisNumber = CardConverter.toNumber(cards[i].num);
+            if (thisColor != desiredColor && thisNumber == desiredNumber - 1) {
+                desiredColor = thisColor;
+                desiredNumber = thisNumber;
+            }
+            else return false;
+        }
+        return true;
     }
 }
 Game.DECK_SIZE = 52;

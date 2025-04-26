@@ -10,4 +10,7 @@ export class Controller {
     start() {
         return this.game;
     }
+    canSelect(card,posX,posY, section){
+        return this.game.canSelect(card,posX,posY, section);
+    }
 }
