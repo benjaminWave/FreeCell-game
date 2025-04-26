@@ -1,19 +1,24 @@
 {
- 
-   
-  "name": "your-project",
- 
-   
-  "version": "1.0.0",
- 
-   
-  "dependencies": {
- 
-   
-   
-   
-  "express": "^5.1.0"
- 
-   
-  }
+ 
+   
+"name": "your-project",
+ 
+   
+"version": "1.0.0",
+ 
+   
+"dependencies": {
+ 
+   
+ 
+   
+"express": "^5.1.0",
+ 
+   
+ 
+   
+"undici-types": "^7.8.0"
+ 
+   
+}
 }

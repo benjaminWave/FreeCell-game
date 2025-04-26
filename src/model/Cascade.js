@@ -1,80 +1,51 @@
-"use strict";
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    };
-    return function (d, b) {
-        if (typeof b !== "function" && b !== null)
-            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
-    if (pack || arguments.length === 2) for (var i = 0, l = from.length, ar; i < l; i++) {
-        if (ar || !(i in from)) {
-            if (!ar) ar = Array.prototype.slice.call(from, 0, i);
-            ar[i] = from[i];
-        }
+import { Component } from "./Component.js";
+export class Cascade extends Component {
+    constructor(position) {
+        super();
+        this.position = position;
+        this.cards = new Array();
     }
-    return to.concat(ar || Array.prototype.slice.call(from));
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.Cascade = void 0;
-var Component_1 = require("./Component");
-var Cascade = /** @class */ (function (_super) {
-    __extends(Cascade, _super);
-    function Cascade(position) {
-        var _this = _super.call(this) || this;
-        _this.position = position;
-        _this.cards = new Array();
-        return _this;
-    }
-    Cascade.prototype.setPosition = function (newPosition) {
+    setPosition(newPosition) {
         this.position = newPosition;
-    };
-    Cascade.prototype.getHead = function () {
+    }
+    getHead() {
         return this.cards[this.cards.length - 1];
-    };
-    Cascade.prototype.getTail = function () {
+    }
+    getTail() {
         return this.cards[0];
-    };
-    Cascade.prototype.addAtTop = function (card) {
+    }
+    addAtTop(card) {
         this.cards.push(card);
-    };
-    Cascade.prototype.isEmpty = function () {
+    }
+    isEmpty() {
         return (this.cards.length == 0);
-    };
-    Cascade.prototype.size = function () {
+    }
+    size() {
         return this.cards.length;
-    };
-    Cascade.prototype.addAtBottom = function (card) {
+    }
+    addAtBottom(card) {
         this.cards.push(card);
-    };
-    Cascade.prototype.getPosition = function () {
+    }
+    getPosition() {
         return this.position;
-    };
-    Cascade.prototype.remove = function (card) {
-        var indexRemoved = this.cards.indexOf(card);
+    }
+    remove(card) {
+        let indexRemoved = this.cards.indexOf(card);
         if (indexRemoved > -1) {
-            this.cards = __spreadArray(__spreadArray([], this.cards.slice(0, indexRemoved), true), this.cards.slice(indexRemoved + 1), true);
+            this.cards = [...this.cards.slice(0, indexRemoved), ...this.cards.slice(indexRemoved + 1)];
             return true;
         }
         return false;
-    };
-    Cascade.prototype.toString = function () {
+    }
+    toString() {
         var str = new Array();
         var card;
         for (card in this.cards) {
             str.push(card.toString() + " ");
         }
         return str.toString();
-    };
-    Cascade.prototype.removeAt = function (position) {
+    }
+    removeAt(position) {
         var returned = new Cascade(this.getPosition());
         for (var i = position; i < this.size(); i++) {
             if (position + 1 == this.size()) {
@@ -84,7 +55,5 @@ var Cascade = /** @class */ (function (_super) {
             this.remove(this.cards[i]);
         }
         return returned;
-    };
-    return Cascade;
-}(Component_1.Component));
-exports.Cascade = Cascade;
+    }
+}

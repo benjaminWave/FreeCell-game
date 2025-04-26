@@ -10,6 +10,7 @@ export class Card extends Component {
     private suit: Suit;
     private position: Vector2;
     private num: number;
+  
 
     constructor(color: Color, type: Suit, position: Vector2, num: number) {
         super()

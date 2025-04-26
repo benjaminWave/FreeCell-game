@@ -1,4 +1,4 @@
-//TEST ADDING CARD STACKS, MOVING CARD STACKS then on to merging game to validate moves, then logging state of game to unndo
+// merging game to validate moves, then logging state of game to unndo
 var button = document.getElementById('startButton')
 var svgElement = document.getElementById('gameSVG')
 var svgNS = "http://www.w3.org/2000/svg";
@@ -15,6 +15,8 @@ var scaleX = 0.4;
 var scaleY = 0.4;
 var holder = null;
 var isMoving = false;
+import { Controller } from "./controller.js";
+const controller = new Controller();
 function generateGame() {
     button.remove();
     //ADD FUNCTION TO CLEAR THE BOARD
@@ -24,17 +26,9 @@ function generateGame() {
     createSection('tableauArea', 8, 25, 145);
     createMover();
     startGame();
-    // testAddCard('RED', 'HEARTS', 'ACE', 1);
-    //testAddCard('BLACK', 'CLUBS', 'TWO', 3);
-    //testAddCard('RED', 'DIAMONDS', 'JACK', 7);
 }
-async function startGame() {
-    const response = await fetch('http://localhost:3500/game/start', {
-        method: 'GET',
-
-    });
-    const responseData = await response.json();
-    const game = responseData.object;
+function startGame() {
+    const game = controller.start();
     const tableaus = game.tableaus
     for (var i = 0; i < tableaus.length; i++) {
         const cards = tableaus[i].cards;
@@ -45,6 +39,25 @@ async function startGame() {
         }
     }
 }
+
+async function validateSelect(color, suit, X, Y, num, section) {
+    const response = await fetch('http://localhost:3500/game/checkSelect', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            card: { 'color': color, 'type': suit, 'num': num },
+            posX: X,
+            posY: Y,
+            section: section
+
+        })
+    });
+    const responseData = await response.json();
+}
+
+
 function createSection(tag, size, offsetX, offsetY) {
     var mainG = document.createElementNS(svgNS, 'g')
     mainG.setAttribute('id', tag);
@@ -83,13 +96,14 @@ function addCard(color, suit, number, dest) {
     scale(holdG, scaleX, scaleY, 0)
     mover.appendChild(holdG);
     transportCards(mover);
-    
+
     let isDragging = false;
     scaleX = holder.getCTM().a;
     scaleY = holder.getCTM().d;
     ///INPUT BEGIN
     holdG.addEventListener('mousedown', (event) => {
         if (isMoving) return;
+        if (!canSelect()) return;
         holder = holdG.parentNode
         var mover = document.getElementById('mover');
         isDragging = true;
@@ -108,6 +122,10 @@ function addCard(color, suit, number, dest) {
         mouseY = event.clientY
 
     });
+}
+
+function canSelect() {
+    return false;
 }
 function lerp(a, b, t) {
     return a + (b - a) * t;
@@ -143,7 +161,7 @@ function handleMouseUp(event) {
 
 function animateMover(sX, eX, sY, eY, element) {
     var t = 0;
-    var duration = 100;
+    var duration = 150;
     let startTime = performance.now();
 
     function update() {

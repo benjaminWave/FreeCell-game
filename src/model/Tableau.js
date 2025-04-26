@@ -1,70 +1,49 @@
-"use strict";
-var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
-    if (pack || arguments.length === 2) for (var i = 0, l = from.length, ar; i < l; i++) {
-        if (ar || !(i in from)) {
-            if (!ar) ar = Array.prototype.slice.call(from, 0, i);
-            ar[i] = from[i];
-        }
-    }
-    return to.concat(ar || Array.prototype.slice.call(from));
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.TableauIterator = exports.Tableau = void 0;
-var Tableau = /** @class */ (function () {
-    function Tableau(number) {
+export class Tableau {
+    constructor(number) {
         this.number = number;
         this.cards = new Array();
     }
-    Tableau.prototype.getNumber = function () {
+    getNumber() {
         return this.number;
-    };
-    Tableau.prototype.add = function (comp) {
+    }
+    add(comp) {
         this.cards.push(comp);
-    };
-    Tableau.prototype.remove = function (comp) {
-        var indexRemoved = this.cards.indexOf(comp);
+    }
+    remove(comp) {
+        let indexRemoved = this.cards.indexOf(comp);
         if (indexRemoved > -1) {
-            this.cards = __spreadArray(__spreadArray([], this.cards.slice(0, indexRemoved), true), this.cards.slice(indexRemoved + 1), true);
+            this.cards = [...this.cards.slice(0, indexRemoved), ...this.cards.slice(indexRemoved + 1)];
             return true;
         }
         return false;
-    };
-    Tableau.prototype.replace = function (original, replacement) {
+    }
+    replace(original, replacement) {
         this.cards[this.cards.indexOf(original)] = replacement;
-    };
-    Tableau.prototype.getHead = function () {
+    }
+    getHead() {
         return this.cards[this.cards.length - 1];
-    };
-    Tableau.prototype.isEmpty = function () {
+    }
+    isEmpty() {
         return (this.cards.length == 0);
-    };
-    Tableau.prototype.size = function () {
+    }
+    size() {
         return this.cards.length;
-    };
-    Tableau.prototype[Symbol.iterator] = function () {
+    }
+    [Symbol.iterator]() {
         return new TableauIterator(this);
-    };
-    return Tableau;
-}());
-exports.Tableau = Tableau;
-var TableauIterator = /** @class */ (function () {
-    function TableauIterator(tab) {
+    }
+}
+export class TableauIterator {
+    constructor(tab) {
         this.currentPosition = tab.size() - 1;
     }
-    TableauIterator.prototype.next = function () {
-        var _a = [];
-        for (var _i = 0; _i < arguments.length; _i++) {
-            _a[_i] = arguments[_i];
-        }
-        var value = _a[0];
+    next(...[value]) {
         throw new Error("Method not implemented.");
-    };
-    TableauIterator.prototype.return = function (value) {
+    }
+    return(value) {
         throw new Error("Method not implemented.");
-    };
-    TableauIterator.prototype.throw = function (e) {
+    }
+    throw(e) {
         throw new Error("Method not implemented.");
-    };
-    return TableauIterator;
-}());
-exports.TableauIterator = TableauIterator;
+    }
+}

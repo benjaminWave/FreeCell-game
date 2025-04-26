@@ -1,7 +1,4 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.CardNumber = void 0;
-var CardNumber;
+export var CardNumber;
 (function (CardNumber) {
     CardNumber[CardNumber["ACE"] = 0] = "ACE";
     CardNumber[CardNumber["TWO"] = 1] = "TWO";
@@ -16,4 +13,4 @@ var CardNumber;
     CardNumber[CardNumber["JACK"] = 10] = "JACK";
     CardNumber[CardNumber["QUEEN"] = 11] = "QUEEN";
     CardNumber[CardNumber["KING"] = 12] = "KING";
-})(CardNumber || (exports.CardNumber = CardNumber = {}));
+})(CardNumber || (CardNumber = {}));

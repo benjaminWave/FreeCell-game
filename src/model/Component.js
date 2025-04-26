@@ -1,12 +1,5 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.Component = void 0;
-var Component = /** @class */ (function () {
-    function Component() {
-    }
-    Component.prototype.getHead = function () {
+export class Component {
+    getHead() {
         return this;
-    };
-    return Component;
-}());
-exports.Component = Component;
+    }
+}

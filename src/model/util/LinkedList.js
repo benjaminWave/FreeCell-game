@@ -1,35 +1,32 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.LinkedList = void 0;
-var ListNode_1 = require("./ListNode");
-var LinkedList = /** @class */ (function () {
-    function LinkedList() {
+import { ListNode } from './ListNode';
+export class LinkedList {
+    constructor() {
         this.head = null;
         this.capacity = 0;
     }
-    LinkedList.prototype.addFirst = function (item) {
-        var node = new ListNode_1.ListNode(item);
+    addFirst(item) {
+        var node = new ListNode(item);
         node.setNext(this.head);
         this.head = node;
         this.capacity++;
-    };
-    LinkedList.prototype.remove = function (item) {
+    }
+    remove(item) {
         this.capacity--;
         return false;
-    };
-    LinkedList.prototype.size = function () {
+    }
+    size() {
         return this.capacity;
-    };
-    LinkedList.prototype.isEmpty = function () {
+    }
+    isEmpty() {
         return (this.capacity === 0);
-    };
-    LinkedList.prototype.getFirst = function () {
+    }
+    getFirst() {
         if (this.head) {
             return this.head.getValue();
         }
         return null;
-    };
-    LinkedList.prototype.set = function (index, replacement) {
+    }
+    set(index, replacement) {
         var count = 1;
         if (this.head) {
             if (index == 0) {
@@ -46,8 +43,8 @@ var LinkedList = /** @class */ (function () {
                 }
             }
         }
-    };
-    LinkedList.prototype.indexOf = function (item) {
+    }
+    indexOf(item) {
         var count = 1;
         if (this.head) {
             if (this.head.getValue() == item) {
@@ -63,7 +60,5 @@ var LinkedList = /** @class */ (function () {
             }
         }
         return -1;
-    };
-    return LinkedList;
-}());
-exports.LinkedList = LinkedList;
+    }
+}
