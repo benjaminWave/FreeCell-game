@@ -8,13 +8,13 @@ export class Controller {
     start() {
         return this.game;
     }
-    canSelect(card, posX, posY, section) {
-        return this.game.canSelect(card, posX, posY, section);
+    canSelect(card, section, size) {
+        return this.game.canSelect(card, section, size);
     }
     updateMove(from, to, card) {
         this.game.update(from, to, card)
     }
-    validateMove(from, to, card,size) {
-        return this.game.isValidMove(from, to, card,size)
+    validateMove(from, to, card, size) {
+        return this.game.isValidMove(from, to, card, size)
     }
 }

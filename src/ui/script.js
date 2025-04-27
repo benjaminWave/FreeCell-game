@@ -1,5 +1,6 @@
 //  logging state of game to unndo
-// bug with rightclicking
+// maybe make dragging only left click?
+// add an option to auto assign if foundation can be played
 var button = document.getElementById('startButton')
 var svgElement = document.getElementById('gameSVG')
 var svgNS = "http://www.w3.org/2000/svg";
@@ -17,15 +18,16 @@ var scaleY = 0.4;
 var holder = null;
 var from = null;
 var isMoving = false;
+var isSelected = false;
 import { Controller } from "./controller.js";
 const controller = new Controller();
 function generateGame() {
     button.remove();
     //ADD FUNCTION TO CLEAR THE BOARD
     //Add timer
-    createSection('freeCell', 4, 0, 0);
-    createSection('foundCell', 4, cardSpacing * 4.5, 0);
-    createSection('tableauArea', 8, 25, 145);
+    createSection('freeCell', 4, 0, 0, 0);
+    createSection('foundCell', 4, cardSpacing * 4.5, 0, 0);
+    createSection('tableauArea', 8, 25, 145, 1);
     createMover();
     startGame();
 }
@@ -44,7 +46,7 @@ function startGame() {
 
 
 
-function createSection(tag, size, offsetX, offsetY) {
+function createSection(tag, size, offsetX, offsetY, stackable) {
     var mainG = document.createElementNS(svgNS, 'g')
     mainG.setAttribute('id', tag);
 
@@ -57,6 +59,7 @@ function createSection(tag, size, offsetX, offsetY) {
         newG.setAttribute('id', tag + 'pos' + i);
         newG.setAttribute('pos', i);
         newG.setAttribute('tag', tag);
+        newG.setAttribute('stackable', stackable);
         newG.setAttribute('class', 'section')
         newG.setAttribute('transform', `translate (${cardSpacing * (i - 1)},0) scale(${cardScale},${cardScale})`);
         var img = document.createElementNS(svgNS, 'image');
@@ -69,6 +72,7 @@ function createSection(tag, size, offsetX, offsetY) {
 function createMover() {
     var mainG = document.createElementNS(svgNS, 'g')
     mainG.setAttribute('id', 'mover');
+    mainG.setAttribute('stackable', 1);
     svgElement.appendChild(mainG);
 }
 function getCard(element, x, y) {
@@ -91,20 +95,19 @@ function addCard(color, suit, number, dest) {
     scale(holdG, scaleX, scaleY, 0)
     mover.appendChild(holdG);
     transportCards(mover);
-
-    let isDragging = false;
     scaleX = holder.getCTM().a;
     scaleY = holder.getCTM().d;
     ///INPUT BEGIN
     holdG.addEventListener('mousedown', (event) => {
         if (isMoving) return;
+        if (isSelected) return;
         holder = holdG.parentNode
         let x = holder.getAttribute('pos');
         let y = holdG.getAttribute('y');
-        var result = controller.canSelect(getCard(holdG, x, y), holder.getAttribute('pos'), getIndex(holder, holdG), holder.getAttribute('tag'));
+        var result = controller.canSelect(getCard(holdG, x, y), holder.getAttribute('tag'),holder.children.length-y);
         if (!result) return;
         var mover = document.getElementById('mover');
-        isDragging = true;
+        isSelected = true;
         draggedCard = holdG
         let parent = holdG.parentNode
         let index = (Array.prototype.indexOf.call(parent.children, holdG));
@@ -150,19 +153,21 @@ function handleMouseMove(event) {
 function handleMouseUp(event) {
     if (draggedCard) {
         isMoving = true
+        isSelected = false;
         var mover = document.getElementById('mover');
         from = holder;
-        holder = findClosestElement(draggedCard, holder, mouseX, mouseY);
-      
 
-        if (holder != from){
+        holder = findClosestElement(draggedCard, holder, mouseX, mouseY);
+
+
+        if (holder != from) {
             let x = from.getAttribute('pos');
             let y = draggedCard.getAttribute('y');
             const card = getCard(draggedCard, x, y)
-            if(!controller.validateMove(from.getAttribute('id'), holder.getAttribute('id'), card,mover.children.length)) holder = from;
+            if (!controller.validateMove(from.getAttribute('id'), holder.getAttribute('id'), card, mover.children.length)) holder = from;
             //else  controller.updateMove(from.getAttribute('id'), holder.getAttribute('id'), card);
-        } 
-        let offset = (31) * (holder.children.length - 1)
+        }
+        let offset = (31) * (holder.children.length - 1) * holder.getAttribute('stackable')
         animateMover(mover.getCTM().e, holder.getBoundingClientRect().x - 8, mover.getCTM().f, holder.getBoundingClientRect().y - 19 + offset, mover)
         draggedCard = null;
     }
@@ -192,18 +197,18 @@ function transportCards(mover) {
     let tempArr = collectCards(mover, 0)
     for (var i = 0; i < tempArr.length; i++) {
         let currentCard = tempArr[i];
-        if (holder != from){
+        if (holder != from) {
             let x = from.getAttribute('pos');
             let y = currentCard.getAttribute('y');
             const card = getCard(currentCard, x, y);
             controller.updateMove(from.getAttribute('id'), holder.getAttribute('id'), card);
         }
-       
+
         currentCard.setAttribute('y', holder.children.length)
         holder.appendChild(currentCard);
 
 
-        unScale(currentCard, holder.children.length - 1, true);
+        unScale(currentCard, holder.children.length - 1, true, holder.getAttribute('stackable'));
     }
 }
 
@@ -211,8 +216,8 @@ function scale(element, X, Y, index) {
     let offset = (31) * (index - 1)
     element.setAttribute('transform', `translate (0,${offset})scale(${X},${Y})`)
 }
-function unScale(element, index, cond) {
-    let offset = (31 / scaleX) * (index - 1) //offset y by a fourth of card size scaled to match card scale and get the index - base
+function unScale(element, index, cond, stackable) {
+    let offset = (31 / scaleX) * (index - 1) * stackable //offset y by a fourth of card size scaled to match card scale and get the index - base
 
     element.setAttribute('transform', `translate (0,${offset})scale(1,1)`);
     element.firstChild.removeAttribute('transform');

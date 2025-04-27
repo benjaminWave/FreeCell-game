@@ -13,29 +13,21 @@ export class Game {
         this.foundations = new Array(Game.FOUNDATION_SIZE);
         this.cells = new Array(Game.FREECELL_SIZE);
         this.cards = new Array(Game.DECK_SIZE);
+        this.sections = { 'foundCell': this.foundations, 'tableauArea': this.tableaus, 'freeCell': this.cells }
         this.cascades = new Array();
-        this.createTableaus();
-        this.createFoundations();
-        this.createCells();
+        this.createSection('tableauArea', Game.TABLEAU_SIZE);
+        this.createSection('foundCell', Game.FOUNDATION_SIZE);
+        this.createSection('freeCell', Game.FREECELL_SIZE);
         this.createCards();
         this.shuffle();
         //this.checkForCascades();
     }
-    createTableaus() {
-        for (var i = 1; i <= Game.TABLEAU_SIZE; i++) {
-            this.tableaus[i - 1] = new Section(i, 'tableauArea');
+    createSection(section, size) {
+        for (var i = 1; i <= size; i++) {
+            this.sections[section][i - 1] = new Section(i, section);
         }
     }
-    createFoundations() {
-        for (var i = 1; i <= Game.FOUNDATION_SIZE; i++) {
-            this.foundations[i - 1] = new Section(i, 'foundCell');
-        }
-    }
-    createCells() {
-        for (var i = 1; i <= Game.FREECELL_SIZE; i++) {
-            this.cells[i - 1] = new Section(i, 'freeCell');
-        }
-    }
+
     createCards() {
         var currentNumber = 0;
         var suit;
@@ -73,6 +65,15 @@ export class Game {
             }
         }
     }
+
+    getEmptySections(section) {
+        let list = this.sections[section];
+        let count = 0;
+        for (section of list) {
+            if (section.isEmpty()) count++;
+        }
+        return count;
+    }
     parse(term) {
         const parts = term.split("pos");
         const prefix = parts[0];
@@ -96,6 +97,7 @@ export class Game {
         var sectionTo = this.parse(to);
         card = this.formCard(card);
         var desiredColor = card.color;
+        var desiredSuit = card.suit;
         var desiredNumber = CardConverter.toNumber(card.num);
 
         var valid = true;
@@ -104,7 +106,7 @@ export class Game {
             if (size > 1) valid = false;
             else if (!sectionTo.isEmpty()) {
                 var destCard = sectionTo.getHead()
-                valid = (destCard.color === desiredColor && CardConverter.toNumber(destCard.num) === desiredNumber - 1)
+                valid = (destCard.color === desiredColor && destCard.suit === desiredSuit && CardConverter.toNumber(destCard.num) === desiredNumber - 1)
             }
             else valid = (desiredNumber < 1);
         }
@@ -122,11 +124,20 @@ export class Game {
 
         return valid;
     }
+    isWithinMaxCards(size) {
+        const m = this.getEmptySections('tableauArea')
+        const n = this.getEmptySections('freeCell')
+        const c = (2 ** m) * (n + 1);
+        return c >= size
+    }
+    canSelect(card, section, size) {
+        if (section != "tableauArea") {
+            if (size < 2) return true; //CHECK FOR SIZE IN CASE FREE CELL OR FOUNDATION CASCADE
+            return false;
+        }
+        if (this.isWithinMaxCards(size)) return this.isCascade(this.tableaus[card['x'] - 1], card);
+        return false;
 
-    canSelect(card, posX, posY, section) {
-
-        if (section != "tableauArea") return true;
-        return this.isCascade(this.tableaus[posX - 1], card, posX, posY);
     }
     getIndex(array, card) {
 
@@ -139,8 +150,8 @@ export class Game {
     cardEquals(card1, card2) {
         return card1.num === card2.num && card1.suit === card2.suit //&& card1.position.getX() === card2.position.getX() && card1.position.getY() === card2.position.getY();
     }
-    isCascade(tab, card, posX, posY) {
-        card = this.formCard(card, posX, posY);
+    isCascade(tab, card) {
+        card = this.formCard(card);
         var index = this.getIndex(tab.cards, card);
         if (index === -1) return false;
         var cards = tab.cards;
