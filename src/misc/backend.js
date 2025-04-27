@@ -1,6 +1,6 @@
 const express = require('express');
 const app = express();
-const Game = require('./Game');
+const Game = require('../ui/Game');
 const port = 3500;
 var game;
 app.use((req, res, next) => {
