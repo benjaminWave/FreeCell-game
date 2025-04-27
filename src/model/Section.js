@@ -1,4 +1,4 @@
-export class Tableau {
+export class Section {
     constructor(number) {
         this.number = number;
         this.cards = new Array();

@@ -1,4 +1,4 @@
-import { Game } from "./Game";
+import { Game } from "../misc/Game";
 
 export class Main{
     public thisGame:Game;

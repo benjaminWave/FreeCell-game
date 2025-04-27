@@ -3,7 +3,7 @@ import { CardNumber } from "../model/CardNumber";
 import { CardConverter } from "../model/CardConverter";
 import { Cascade } from "../model/Cascade";
 import { Suit } from "../model/Suit";
-import { Tableau } from "../model/Tableau";
+import { Tableau } from "../model/Section";
 import { Vector2 } from "../model/Vector2";
 
 export class Game {

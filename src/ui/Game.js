@@ -2,7 +2,7 @@ import { Card } from "../model/Card.js";
 import { CardNumber } from "../model/CardNumber.js";
 import { CardConverter } from "../model/CardConverter.js";
 import { Suit } from "../model/Suit.js";
-import { Tableau } from "../model/Tableau.js";
+import { Section } from "../model/Section.js";
 import { Vector2 } from "../model/Vector2.js";
 export class Game {
     constructor() {
@@ -19,7 +19,7 @@ export class Game {
     }
     createTableaus() {
         for (var i = 1; i <= Game.TABLEAU_SIZE; i++) {
-            this.tableaus[i - 1] = new Tableau(i);
+            this.tableaus[i - 1] = new Section(i);
         }
     }
     createCards() {
@@ -72,7 +72,6 @@ export class Game {
         sectionFrom.remove(this.getIndex(sectionFrom.cards, card));
         card.setPosition(new Vector2(sectionTo.getNumber(), sectionTo.cards.length))
         sectionTo.add(card);
-        console.log(sectionTo.cards);
     }
     isValidMove(from, to, card) {
         var sectionFrom = this.parse(from);
@@ -122,4 +121,6 @@ export class Game {
 }
 Game.DECK_SIZE = 52;
 Game.TABLEAU_SIZE = 8;
+Game.FOUNDATION_SIZE = 4;
+Game.FREECELL_SIZE = 4;
 Game.MAX_TABLEAU_SIZE = 6;

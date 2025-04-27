@@ -8,7 +8,7 @@ export * from "./Color";
 
 export * from "./Foundation";
 export * from "./Suit";
-export * from "./Tableau";
+export * from "./Section";
 export * from "./Vector2";
 export * from "./util/LinkedList"
 export * from "./util/ListNode";
