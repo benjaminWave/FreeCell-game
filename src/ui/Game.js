@@ -4,6 +4,9 @@ import { CardConverter } from "../model/CardConverter.js";
 import { Suit } from "../model/Suit.js";
 import { Section } from "../model/Section.js";
 import { Vector2 } from "../model/Vector2.js";
+import { Event } from "../model/Log/Event.js";
+import { EventLog } from "../model/Log/EventLog.js";
+const eventLog = EventLog.LOG;
 export class Game {
     constructor() {
         this.setUp();
@@ -92,6 +95,9 @@ export class Game {
         sectionFrom.remove(this.getIndex(sectionFrom.cards, card));
         card.setPosition(new Vector2(sectionTo.getNumber(), sectionTo.cards.length))
         sectionTo.add(card);
+        const event = new Event(card,from, to);
+        eventLog.log(event);
+        
     }
     isValidMove(from, to, card, size) {
         var sectionTo = this.parse(to);
