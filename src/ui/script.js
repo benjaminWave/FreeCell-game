@@ -1,9 +1,11 @@
-//  logging state of game to unndo
+//  unndo
 // maybe make dragging only left click?
 // add an option to auto assign if foundation can be played
+//fix document sizing
 var button = document.getElementById('startButton')
 var svgElement = document.getElementById('gameSVG')
 var svgNS = "http://www.w3.org/2000/svg";
+const htmlNS = "http://www.w3.org/1999/xhtml";
 var cardScale = 0.4
 var cardSpacing = 100;
 const placeHolderIMG = '../imgs/placeholder.png';
@@ -19,6 +21,7 @@ var holder = null;
 var from = null;
 var isMoving = false;
 var isSelected = false;
+const stackOffset = 31;
 import { Controller } from "./controller.js";
 const controller = new Controller();
 function generateGame() {
@@ -29,6 +32,7 @@ function generateGame() {
     createSection('foundCell', 4, cardSpacing * 4.5, 0, 0);
     createSection('tableauArea', 8, 25, 145, 1);
     createMover();
+    createWoodPanel();
     startGame();
 }
 function startGame() {
@@ -75,6 +79,19 @@ function createMover() {
     mainG.setAttribute('stackable', 1);
     svgElement.appendChild(mainG);
 }
+
+function createWoodPanel() {
+    var mainG = document.createElementNS(svgNS, 'g');
+    mainG.setAttribute('id', 'panel');
+    let offsetX = 1243;
+
+    mainG.setAttribute('transform', `translate (${offsetX},${0})`);
+    var rect = document.createElementNS(svgNS, 'rect');
+    rect.setAttribute('class', 'panel');
+
+    mainG.appendChild(rect);
+    svgElement.appendChild(mainG);
+}
 function getCard(element, x, y) {
     return { 'color': element.getAttribute('color'), 'type': element.getAttribute('suit'), 'num': element.getAttribute('number'), 'x': x, 'y': y };
 }
@@ -104,7 +121,7 @@ function addCard(color, suit, number, dest) {
         holder = holdG.parentNode
         let x = holder.getAttribute('pos');
         let y = holdG.getAttribute('y');
-        var result = controller.canSelect(getCard(holdG, x, y), holder.getAttribute('tag'),holder.children.length-y);
+        var result = controller.canSelect(getCard(holdG, x, y), holder.getAttribute('tag'), holder.children.length - y);
         if (!result) return;
         var mover = document.getElementById('mover');
         isSelected = true;
@@ -144,6 +161,7 @@ function collectCards(element, start) {
 function handleMouseMove(event) {
     if (draggedCard) {
         var mover = document.getElementById('mover');
+
         moveToMouse(event, mover)
         mouseX = event.clientX
         mouseY = event.clientY
@@ -167,8 +185,9 @@ function handleMouseUp(event) {
             if (!controller.validateMove(from.getAttribute('id'), holder.getAttribute('id'), card, mover.children.length)) holder = from;
             //else  controller.updateMove(from.getAttribute('id'), holder.getAttribute('id'), card);
         }
-        let offset = (31) * (holder.children.length - 1) * holder.getAttribute('stackable')
-        animateMover(mover.getCTM().e, holder.getBoundingClientRect().x - 8, mover.getCTM().f, holder.getBoundingClientRect().y - 19 + offset, mover)
+        let offset = (stackOffset) * (holder.children.length - 1) * holder.getAttribute('stackable')
+        const mainDiv = document.getElementById("background").getBoundingClientRect();
+        animateMover(mover.getCTM().e, holder.getBoundingClientRect().x - mainDiv.x, mover.getCTM().f, holder.getBoundingClientRect().y - 19 + offset, mover)
         draggedCard = null;
     }
 }
@@ -213,11 +232,11 @@ function transportCards(mover) {
 }
 
 function scale(element, X, Y, index) {
-    let offset = (31) * (index - 1)
+    let offset = (stackOffset) * (index - 1)
     element.setAttribute('transform', `translate (0,${offset})scale(${X},${Y})`)
 }
 function unScale(element, index, cond, stackable) {
-    let offset = (31 / scaleX) * (index - 1) * stackable //offset y by a fourth of card size scaled to match card scale and get the index - base
+    let offset = (stackOffset / scaleX) * (index - 1) * stackable //offset y by a fourth of card size scaled to match card scale and get the index - base
 
     element.setAttribute('transform', `translate (0,${offset})scale(1,1)`);
     element.firstChild.removeAttribute('transform');
@@ -225,8 +244,9 @@ function unScale(element, index, cond, stackable) {
 }
 
 function moveToMouse(event, element) {
-    let x = event.clientX - 37
-    let y = event.clientY - 85
+    const mainDiv = document.getElementById("background").getBoundingClientRect();
+    let x = (event.clientX + window.scrollX - (mainDiv.x - 8)) - element.getBoundingClientRect().width / 2
+    let y = (event.clientY + window.scrollY) - element.getBoundingClientRect().height / 2
     element.setAttribute('transform', `translate(${x}, ${y})`); // previously x/scaleX
 }
 function findClosestElement(element, parent, X, Y) {
@@ -244,6 +264,10 @@ function findClosestElement(element, parent, X, Y) {
 function isOverlapping(e1, X, Y) {
     var rect2 = e1.getBoundingClientRect();
     return (X > rect2.left && X < rect2.right && Y < rect2.bottom && Y > rect2.top)
+
+}
+
+function undo() {
 
 }
 

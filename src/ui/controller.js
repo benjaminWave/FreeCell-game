@@ -17,4 +17,7 @@ export class Controller {
     validateMove(from, to, card, size) {
         return this.game.isValidMove(from, to, card, size)
     }
+    handleUndo(){
+        
+    }
 }

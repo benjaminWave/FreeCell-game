@@ -10,11 +10,25 @@ h1 {
 
 .container {
 
-    height: 570px;
-    width: 1300px;
+    position: relative;
     margin: auto;
     background-image: url('../imgs/background.png');
+    border: 3px solid;
+    max-width: 1100px; 
+    min-width: 1100px; 
+    max-height: 575px; 
+    min-height: 575px; 
 }
+
+.panel{
+    height: 575px;
+    width: 400px;
+    fill: url(#texture);
+    stroke: black;
+    stroke-width: 2px;
+}
+
+
 
 .startButton {
     padding: 10px 10px;
