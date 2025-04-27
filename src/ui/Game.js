@@ -92,18 +92,33 @@ export class Game {
         card.setPosition(new Vector2(sectionTo.getNumber(), sectionTo.cards.length))
         sectionTo.add(card);
     }
-    isValidMove(from, to, card) {
-        var sectionFrom = this.parse(from);
+    isValidMove(from, to, card, size) {
         var sectionTo = this.parse(to);
         card = this.formCard(card);
         var desiredColor = card.color;
         var desiredNumber = CardConverter.toNumber(card.num);
 
         var valid = true;
-        if (!sectionTo.isEmpty()) {
-            var destCard = sectionTo.getHead()
-            valid = (destCard.color != desiredColor && CardConverter.toNumber(destCard.num) === desiredNumber + 1)
+        const type = sectionTo.getType();
+        if (type === "foundCell") {
+            if (size > 1) valid = false;
+            else if (!sectionTo.isEmpty()) {
+                var destCard = sectionTo.getHead()
+                valid = (destCard.color === desiredColor && CardConverter.toNumber(destCard.num) === desiredNumber - 1)
+            }
+            else valid = (desiredNumber < 1);
         }
+        else if (type === "freeCell") {
+            if (size > 1) valid = false;
+            else valid = (sectionTo.isEmpty());
+        }
+        else {
+            if (!sectionTo.isEmpty()) {
+                var destCard = sectionTo.getHead()
+                valid = (destCard.color != desiredColor && CardConverter.toNumber(destCard.num) === desiredNumber + 1)
+            }
+        }
+
 
         return valid;
     }

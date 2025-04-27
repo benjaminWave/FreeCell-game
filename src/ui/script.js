@@ -1,4 +1,5 @@
-// merging game to validate moves, then logging state of game to unndo
+//  logging state of game to unndo
+// bug with rightclicking
 var button = document.getElementById('startButton')
 var svgElement = document.getElementById('gameSVG')
 var svgNS = "http://www.w3.org/2000/svg";
@@ -158,7 +159,7 @@ function handleMouseUp(event) {
             let x = from.getAttribute('pos');
             let y = draggedCard.getAttribute('y');
             const card = getCard(draggedCard, x, y)
-            if(!controller.validateMove(from.getAttribute('id'), holder.getAttribute('id'), card)) holder = from;
+            if(!controller.validateMove(from.getAttribute('id'), holder.getAttribute('id'), card,mover.children.length)) holder = from;
             //else  controller.updateMove(from.getAttribute('id'), holder.getAttribute('id'), card);
         } 
         let offset = (31) * (holder.children.length - 1)

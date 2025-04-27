@@ -14,7 +14,7 @@ export class Controller {
     updateMove(from, to, card) {
         this.game.update(from, to, card)
     }
-    validateMove(from, to, card) {
-        return this.game.isValidMove(from, to, card)
+    validateMove(from, to, card,size) {
+        return this.game.isValidMove(from, to, card,size)
     }
 }
