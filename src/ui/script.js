@@ -33,6 +33,7 @@ function generateGame() {
     createSection('tableauArea', 8, 25, 145, 1);
     createMover();
     createWoodPanel();
+    createButtons();
     startGame();
 }
 function startGame() {
@@ -91,6 +92,18 @@ function createWoodPanel() {
 
     mainG.appendChild(rect);
     svgElement.appendChild(mainG);
+}
+function createButtons() {
+    const mainDiv = document.getElementById('background');
+
+    const button = document.createElement('button');
+    button.setAttribute('id', "undoButton");
+    button.setAttribute('class', "startButton");
+    button.setAttribute('style', "position: absolute;");
+    button.innerHTML = 'Undo'
+
+
+    mainDiv.append(button);
 }
 function getCard(element, x, y) {
     return { 'color': element.getAttribute('color'), 'type': element.getAttribute('suit'), 'num': element.getAttribute('number'), 'x': x, 'y': y };
