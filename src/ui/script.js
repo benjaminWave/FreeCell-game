@@ -70,7 +70,7 @@ function createMover() {
     mainG.setAttribute('id', 'mover');
     svgElement.appendChild(mainG);
 }
-function getCard(element,x,y) {
+function getCard(element, x, y) {
     return { 'color': element.getAttribute('color'), 'type': element.getAttribute('suit'), 'num': element.getAttribute('number'), 'x': x, 'y': y };
 }
 function addCard(color, suit, number, dest) {
@@ -99,8 +99,8 @@ function addCard(color, suit, number, dest) {
         if (isMoving) return;
         holder = holdG.parentNode
         let x = holder.getAttribute('pos');
-        let y =holdG.getAttribute('y');
-        var result = controller.canSelect(getCard(holdG,x,y), holder.getAttribute('pos'), getIndex(holder, holdG), "tableauArea");
+        let y = holdG.getAttribute('y');
+        var result = controller.canSelect(getCard(holdG, x, y), holder.getAttribute('pos'), getIndex(holder, holdG), "tableauArea");
         if (!result) return;
         var mover = document.getElementById('mover');
         isDragging = true;
@@ -152,7 +152,15 @@ function handleMouseUp(event) {
         var mover = document.getElementById('mover');
         from = holder;
         holder = findClosestElement(draggedCard, holder, mouseX, mouseY);
+      
 
+        if (holder != from){
+            let x = from.getAttribute('pos');
+            let y = draggedCard.getAttribute('y');
+            const card = getCard(draggedCard, x, y)
+            if(!controller.validateMove(from.getAttribute('id'), holder.getAttribute('id'), card)) holder = from;
+            //else  controller.updateMove(from.getAttribute('id'), holder.getAttribute('id'), card);
+        } 
         let offset = (31) * (holder.children.length - 1)
         animateMover(mover.getCTM().e, holder.getBoundingClientRect().x - 8, mover.getCTM().f, holder.getBoundingClientRect().y - 19 + offset, mover)
         draggedCard = null;
@@ -183,17 +191,10 @@ function transportCards(mover) {
     let tempArr = collectCards(mover, 0)
     for (var i = 0; i < tempArr.length; i++) {
         let currentCard = tempArr[i];
-       
-        if (from != holder){
-            let x = from.getAttribute('pos');
-            let y =currentCard.getAttribute('y');
-            const card = getCard(currentCard,x,y)
-            controller.updateMove(from.getAttribute('id'), holder.getAttribute('id'), card);
-        } 
         currentCard.setAttribute('y', holder.children.length)
         holder.appendChild(currentCard);
-        
-        
+
+
         unScale(currentCard, holder.children.length - 1, true);
     }
 }

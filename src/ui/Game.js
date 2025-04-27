@@ -68,13 +68,22 @@ export class Game {
     formCard(card) {
         return new Card(card['color'], card['type'], new Vector2(card['x'], card['y']), card['num']);
     }
-    update(from, to, card) {
+    update(sectionFrom,sectionTo, card) {
+        sectionFrom.remove(this.getIndex(sectionFrom.cards, card));
+        card.setPosition(new Vector2(sectionTo.getNumber(), sectionTo.cards.length))
+        sectionTo.add(card);
+        console.log(sectionTo.cards);
+    }
+    isValidMove(from, to, card) {
         var sectionFrom = this.parse(from);
         var sectionTo = this.parse(to);
         card = this.formCard(card);
-        sectionFrom.remove(this.getIndex(sectionFrom.cards,card));
-        card.setPosition(new Vector2(sectionTo.getNumber(),sectionTo.cards.length))
-        sectionTo.add(card);
+        var desiredColor = card.color;
+        var desiredNumber = CardConverter.toNumber(card.num);
+        var destCard = sectionTo.getHead()
+        const valid = (destCard.color != desiredColor && CardConverter.toNumber(destCard.num) === desiredNumber + 1)
+        if (valid) this.update(sectionFrom,sectionTo,card);
+        return valid ;
     }
 
     canSelect(card, posX, posY, section) {

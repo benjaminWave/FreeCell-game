@@ -12,6 +12,9 @@ export class Controller {
         return this.game.canSelect(card, posX, posY, section);
     }
     updateMove(from, to, card) {
-        return this.game.update(from, to, card)
+        this.game.update(from, to, card)
+    }
+    validateMove(from, to, card) {
+        return this.game.isValidMove(from, to, card)
     }
 }
