@@ -1,10 +1,14 @@
 export class Section {
-    constructor(number) {
+    constructor(number,type) {
         this.number = number;
         this.cards = new Array();
+        this.type = type;
     }
     getNumber() {
         return this.number;
+    }
+    getType(){
+        return this.type;
     }
     add(comp) {
         this.cards.push(comp);

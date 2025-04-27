@@ -10,16 +10,30 @@ export class Game {
     }
     setUp() {
         this.tableaus = new Array(Game.TABLEAU_SIZE);
+        this.foundations = new Array(Game.FOUNDATION_SIZE);
+        this.cells = new Array(Game.FREECELL_SIZE);
         this.cards = new Array(Game.DECK_SIZE);
         this.cascades = new Array();
         this.createTableaus();
+        this.createFoundations();
+        this.createCells();
         this.createCards();
         this.shuffle();
         //this.checkForCascades();
     }
     createTableaus() {
         for (var i = 1; i <= Game.TABLEAU_SIZE; i++) {
-            this.tableaus[i - 1] = new Section(i);
+            this.tableaus[i - 1] = new Section(i, 'tableauArea');
+        }
+    }
+    createFoundations() {
+        for (var i = 1; i <= Game.FOUNDATION_SIZE; i++) {
+            this.foundations[i - 1] = new Section(i, 'foundCell');
+        }
+    }
+    createCells() {
+        for (var i = 1; i <= Game.FREECELL_SIZE; i++) {
+            this.cells[i - 1] = new Section(i, 'freeCell');
         }
     }
     createCards() {
@@ -68,7 +82,7 @@ export class Game {
     formCard(card) {
         return new Card(card['color'], card['type'], new Vector2(card['x'], card['y']), card['num']);
     }
-    update(sectionFrom,sectionTo, card) {
+    update(sectionFrom, sectionTo, card) {
         sectionFrom.remove(this.getIndex(sectionFrom.cards, card));
         card.setPosition(new Vector2(sectionTo.getNumber(), sectionTo.cards.length))
         sectionTo.add(card);
@@ -81,8 +95,8 @@ export class Game {
         var desiredNumber = CardConverter.toNumber(card.num);
         var destCard = sectionTo.getHead()
         const valid = (destCard.color != desiredColor && CardConverter.toNumber(destCard.num) === desiredNumber + 1)
-        if (valid) this.update(sectionFrom,sectionTo,card);
-        return valid ;
+        if (valid) this.update(sectionFrom, sectionTo, card);
+        return valid;
     }
 
     canSelect(card, posX, posY, section) {
