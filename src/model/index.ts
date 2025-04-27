@@ -10,6 +10,6 @@ export * from "./Foundation";
 export * from "./Suit";
 export * from "./Section";
 export * from "./Vector2";
-export * from "./util/LinkedList"
-export * from "./util/ListNode";
+export * from "../misc/util/LinkedList"
+export * from "../misc/util/ListNode";
 export * from "./CardNumber";

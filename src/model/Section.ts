@@ -3,7 +3,7 @@ import { Component } from "./Component";
 import { Suit } from "./Suit";
 import { Vector2 } from "./Vector2";
 import {Card} from "./Card";
-import {LinkedList} from "./util/LinkedList";
+
 export class Tableau implements Iterable<Card> {
     private cards: Card[];
     private number: number;
