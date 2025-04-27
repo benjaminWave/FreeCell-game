@@ -100,7 +100,7 @@ function addCard(color, suit, number, dest) {
         holder = holdG.parentNode
         let x = holder.getAttribute('pos');
         let y = holdG.getAttribute('y');
-        var result = controller.canSelect(getCard(holdG, x, y), holder.getAttribute('pos'), getIndex(holder, holdG), "tableauArea");
+        var result = controller.canSelect(getCard(holdG, x, y), holder.getAttribute('pos'), getIndex(holder, holdG), holder.getAttribute('tag'));
         if (!result) return;
         var mover = document.getElementById('mover');
         isDragging = true;
@@ -191,6 +191,13 @@ function transportCards(mover) {
     let tempArr = collectCards(mover, 0)
     for (var i = 0; i < tempArr.length; i++) {
         let currentCard = tempArr[i];
+        if (holder != from){
+            let x = from.getAttribute('pos');
+            let y = currentCard.getAttribute('y');
+            const card = getCard(currentCard, x, y);
+            controller.updateMove(from.getAttribute('id'), holder.getAttribute('id'), card);
+        }
+       
         currentCard.setAttribute('y', holder.children.length)
         holder.appendChild(currentCard);
 

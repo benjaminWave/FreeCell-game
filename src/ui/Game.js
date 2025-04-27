@@ -77,12 +77,17 @@ export class Game {
         const parts = term.split("pos");
         const prefix = parts[0];
         const number = parseInt(parts[1]);
-        if (prefix == "tableauArea") return this.tableaus[number - 1];
+        if (prefix == "foundCell") return this.foundations[number - 1];
+        else if (prefix == "freeCell") return this.cells[number - 1];
+        else return this.tableaus[number - 1];
     }
     formCard(card) {
         return new Card(card['color'], card['type'], new Vector2(card['x'], card['y']), card['num']);
     }
-    update(sectionFrom, sectionTo, card) {
+    update(from, to, card) {
+        var sectionFrom = this.parse(from);
+        var sectionTo = this.parse(to);
+        card = this.formCard(card);
         sectionFrom.remove(this.getIndex(sectionFrom.cards, card));
         card.setPosition(new Vector2(sectionTo.getNumber(), sectionTo.cards.length))
         sectionTo.add(card);
@@ -93,13 +98,18 @@ export class Game {
         card = this.formCard(card);
         var desiredColor = card.color;
         var desiredNumber = CardConverter.toNumber(card.num);
-        var destCard = sectionTo.getHead()
-        const valid = (destCard.color != desiredColor && CardConverter.toNumber(destCard.num) === desiredNumber + 1)
-        if (valid) this.update(sectionFrom, sectionTo, card);
+
+        var valid = true;
+        if (!sectionTo.isEmpty()) {
+            var destCard = sectionTo.getHead()
+            valid = (destCard.color != desiredColor && CardConverter.toNumber(destCard.num) === desiredNumber + 1)
+        }
+
         return valid;
     }
 
     canSelect(card, posX, posY, section) {
+
         if (section != "tableauArea") return true;
         return this.isCascade(this.tableaus[posX - 1], card, posX, posY);
     }
