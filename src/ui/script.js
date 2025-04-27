@@ -14,6 +14,7 @@ var mouseY = 0
 var scaleX = 0.4;
 var scaleY = 0.4;
 var holder = null;
+var from = null;
 var isMoving = false;
 import { Controller } from "./controller.js";
 const controller = new Controller();
@@ -40,22 +41,6 @@ function startGame() {
     }
 }
 
-async function validateSelect(color, suit, X, Y, num, section) {
-    const response = await fetch('http://localhost:3500/game/checkSelect', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            card: { 'color': color, 'type': suit, 'num': num },
-            posX: X,
-            posY: Y,
-            section: section
-
-        })
-    });
-    const responseData = await response.json();
-}
 
 
 function createSection(tag, size, offsetX, offsetY) {
@@ -70,6 +55,7 @@ function createSection(tag, size, offsetX, offsetY) {
         var newG = document.createElementNS(svgNS, 'g');
         newG.setAttribute('id', tag + 'pos' + i);
         newG.setAttribute('pos', i);
+        newG.setAttribute('tag', tag);
         newG.setAttribute('class', 'section')
         newG.setAttribute('transform', `translate (${cardSpacing * (i - 1)},0) scale(${cardScale},${cardScale})`);
         var img = document.createElementNS(svgNS, 'image');
@@ -84,13 +70,20 @@ function createMover() {
     mainG.setAttribute('id', 'mover');
     svgElement.appendChild(mainG);
 }
-
+function getCard(element,x,y) {
+    return { 'color': element.getAttribute('color'), 'type': element.getAttribute('suit'), 'num': element.getAttribute('number'), 'x': x, 'y': y };
+}
 function addCard(color, suit, number, dest) {
     holder = document.getElementById(`tableauAreapos${dest}`)
+    from = holder;
     var intendedCard = cardFolder + color + suit + number + ".png"
     var holdG = document.createElementNS(svgNS, 'g');
     holdG.setAttribute('id', color + suit + number + 'Holder')
     holdG.setAttribute('class', 'cardObject')
+    holdG.setAttribute('color', color)
+    holdG.setAttribute('suit', suit)
+    holdG.setAttribute('number', number)
+    holdG.setAttribute('y', mover.children.length)
     var img = document.createElementNS(svgNS, 'image');
     img.setAttribute('href', intendedCard);
     holdG.appendChild(img);
@@ -104,10 +97,10 @@ function addCard(color, suit, number, dest) {
     ///INPUT BEGIN
     holdG.addEventListener('mousedown', (event) => {
         if (isMoving) return;
-
         holder = holdG.parentNode
-        var cardObj = { 'color': color, 'type': suit, 'num': number };
-        var result = controller.canSelect(cardObj, holder.getAttribute('pos'), Array.from(holder.children).indexOf(holdG), "tableauArea");
+        let x = holder.getAttribute('pos');
+        let y =holdG.getAttribute('y');
+        var result = controller.canSelect(getCard(holdG,x,y), holder.getAttribute('pos'), getIndex(holder, holdG), "tableauArea");
         if (!result) return;
         var mover = document.getElementById('mover');
         isDragging = true;
@@ -128,6 +121,9 @@ function addCard(color, suit, number, dest) {
     });
 }
 
+function getIndex(parent, element) {
+    Array.from(parent.children).indexOf(element)
+}
 
 function lerp(a, b, t) {
     return a + (b - a) * t;
@@ -154,7 +150,9 @@ function handleMouseUp(event) {
     if (draggedCard) {
         isMoving = true
         var mover = document.getElementById('mover');
-        holder = findClosestElement(draggedCard, holder, mouseX, mouseY)
+        from = holder;
+        holder = findClosestElement(draggedCard, holder, mouseX, mouseY);
+
         let offset = (31) * (holder.children.length - 1)
         animateMover(mover.getCTM().e, holder.getBoundingClientRect().x - 8, mover.getCTM().f, holder.getBoundingClientRect().y - 19 + offset, mover)
         draggedCard = null;
@@ -185,10 +183,21 @@ function transportCards(mover) {
     let tempArr = collectCards(mover, 0)
     for (var i = 0; i < tempArr.length; i++) {
         let currentCard = tempArr[i];
+       
+        if (from != holder){
+            let x = from.getAttribute('pos');
+            let y =currentCard.getAttribute('y');
+            const card = getCard(currentCard,x,y)
+            controller.updateMove(from.getAttribute('id'), holder.getAttribute('id'), card);
+        } 
+        currentCard.setAttribute('y', holder.children.length)
         holder.appendChild(currentCard);
+        
+        
         unScale(currentCard, holder.children.length - 1, true);
     }
 }
+
 function scale(element, X, Y, index) {
     let offset = (31) * (index - 1)
     element.setAttribute('transform', `translate (0,${offset})scale(${X},${Y})`)

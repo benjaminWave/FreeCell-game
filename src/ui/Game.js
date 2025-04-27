@@ -59,8 +59,22 @@ export class Game {
             }
         }
     }
-    update() {
-        // this.checkForCascades();
+    parse(term) {
+        const parts = term.split("pos");
+        const prefix = parts[0];
+        const number = parseInt(parts[1]);
+        if (prefix == "tableauArea") return this.tableaus[number - 1];
+    }
+    formCard(card) {
+        return new Card(card['color'], card['type'], new Vector2(card['x'], card['y']), card['num']);
+    }
+    update(from, to, card) {
+        var sectionFrom = this.parse(from);
+        var sectionTo = this.parse(to);
+        card = this.formCard(card);
+        sectionFrom.remove(this.getIndex(sectionFrom.cards,card));
+        card.setPosition(new Vector2(sectionTo.getNumber(),sectionTo.cards.length))
+        sectionTo.add(card);
     }
 
     canSelect(card, posX, posY, section) {
@@ -79,7 +93,7 @@ export class Game {
         return card1.num === card2.num && card1.suit === card2.suit //&& card1.position.getX() === card2.position.getX() && card1.position.getY() === card2.position.getY();
     }
     isCascade(tab, card, posX, posY) {
-        card = new Card(card['color'], card['type'], new Vector2(posX, posY), card['num']);
+        card = this.formCard(card, posX, posY);
         var index = this.getIndex(tab.cards, card);
         if (index === -1) return false;
         var cards = tab.cards;

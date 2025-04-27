@@ -9,8 +9,7 @@ export class Tableau {
     add(comp) {
         this.cards.push(comp);
     }
-    remove(comp) {
-        let indexRemoved = this.cards.indexOf(comp);
+    remove(indexRemoved) {
         if (indexRemoved > -1) {
             this.cards = [...this.cards.slice(0, indexRemoved), ...this.cards.slice(indexRemoved + 1)];
             return true;

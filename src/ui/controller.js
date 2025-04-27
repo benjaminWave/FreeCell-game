@@ -1,7 +1,5 @@
 
 import { Game } from './Game.js';
-
-
 export class Controller {
 
     constructor() {
@@ -10,7 +8,10 @@ export class Controller {
     start() {
         return this.game;
     }
-    canSelect(card,posX,posY, section){
-        return this.game.canSelect(card,posX,posY, section);
+    canSelect(card, posX, posY, section) {
+        return this.game.canSelect(card, posX, posY, section);
+    }
+    updateMove(from, to, card) {
+        return this.game.update(from, to, card)
     }
 }
