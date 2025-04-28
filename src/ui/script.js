@@ -42,7 +42,7 @@ function generateGameGeneral() {
     mouseY = 0;
     timeElapsed = 0;
     moveCount = 0;
-    startTime = new Date().getSeconds();
+    startTime = new Date().getTime();
     createSection('freeCell', 4, 0, 0, 0);
     createSection('foundCell', 4, cardSpacing * 4.5, 0, 0);
     createSection('tableauArea', 8, 25, 145, 1);
@@ -148,7 +148,7 @@ function newGame() {
     if (isMoving) return;
     if (isSelected) return;
     svgElement.innerHTML = '';
-    document.getElementById('otherFeatures').innerHTML='';
+    document.getElementById('otherFeatures').innerHTML = '';
     generateGameGeneral();
 }
 function getCard(element, x, y) {
@@ -299,6 +299,7 @@ function transportCards(mover, canNotify) {
         unScale(currentCard, holder.children.length - 1, true, holder.getAttribute('stackable'));
     }
     if (holder != from && canNotify) {
+        document.getElementById('moveCounter').innerHTML = `Moves: ${++moveCount}`;
         controller.updateMove(from.getAttribute('id'), holder.getAttribute('id'), cardPack);
     }
 }
@@ -351,6 +352,7 @@ function undo() {
         const mainDiv = document.getElementById("background").getBoundingClientRect();
         const middleX = draggedCard.getBoundingClientRect().x
         const middleY = draggedCard.getBoundingClientRect().y
+        document.getElementById('moveCounter').innerHTML = `Moves: ${++moveCount}`;
         moveTo(middleX, middleY, mover)
         from = document.getElementById(response['to']);
         holder = document.getElementById(response['from']);
@@ -364,10 +366,14 @@ function undo() {
         prepareAnimate(false, mover);
     }
 }
-function trackTime(){
-    timeElapsed = new Date().getSeconds()-startTime;
+function trackTime() {
+    timeElapsed = new Date().getTime() - startTime;
     const element = document.getElementById('timer');
-    element.innerHTML = `Time: ${timeElapsed}`;
+    var sec = Math.floor(timeElapsed / 1000) % 60;
+    var min = Math.floor(timeElapsed / 60000);
+    if (sec < 10) sec = "0" + sec;
+    if (min < 10) min = "0" + min;
+    element.innerHTML = `Time: ${min}:${sec}`;
 }
 
 function everyFrame() {
