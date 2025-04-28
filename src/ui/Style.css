@@ -27,6 +27,11 @@ h1 {
     stroke: black;
     stroke-width: 2px;
 }
+.msgPanel{
+    height: 175px;
+    width: 400px;
+    fill:rgb(47, 105, 47);
+}
 
 
 

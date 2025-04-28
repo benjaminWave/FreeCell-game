@@ -338,11 +338,38 @@ function undo() {
 function everyFrame() {
     if (gameOver) return;
     gameOver = checkGameProgress();
-    if (gameOver && !isMoving &&!isSelected) console.log("FINISHED");
+    if (gameOver && !isMoving && !isSelected) loadGameOverScreen();
     else requestAnimationFrame(everyFrame);
 }
-function checkGameProgress(){
+function checkGameProgress() {
     return controller.handleCheckGameOver();
+}
+function loadGameOverScreen() {
+    var mainG = document.createElementNS(svgNS, 'g');
+    mainG.setAttribute('id', 'msg');
+    let offsetX = 300;
+    mainG.setAttribute('transform', `translate (${offsetX},${0})`);
+    var rect = document.createElementNS(svgNS, 'rect');
+    rect.setAttribute('class', 'msgPanel');
+
+    var textElement = document.createElementNS(svgNS, "text");
+    textElement.setAttribute("x", 200);
+    textElement.setAttribute("y", 25);
+    textElement.setAttribute("font-size", "37");
+    textElement.setAttribute("fill", 'white');
+    textElement.setAttribute("text-anchor", "middle");
+    textElement.setAttribute("dominant-baseline", "central");
+    for (var i = 0; i < 2; i++) {
+        let tspan = document.createElementNS(svgNS, "tspan");
+        tspan.innerHTML = (i==0)?"Game Over!":"Start a new game";
+        tspan.setAttribute('x', 200);
+        tspan.setAttribute('dy', '1.2em');
+        textElement.appendChild(tspan);
+    }
+
+    mainG.appendChild(rect);
+    mainG.appendChild(textElement);
+    svgElement.appendChild(mainG);
 }
 
 button.addEventListener("click", generateGame);
