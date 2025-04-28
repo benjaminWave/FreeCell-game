@@ -1,6 +1,4 @@
-// maybe make dragging only left click?
-// add an option to auto assign if foundation can be played
-//fix document sizing
+
 var button = document.getElementById('startButton')
 var svgElement = document.getElementById('gameSVG')
 var svgNS = "http://www.w3.org/2000/svg";
@@ -22,14 +20,15 @@ var isSelected;
 var gameOver;
 var start;
 var end;
+var timeElapsed;
+var startTime;
+var moveCount;
 const clickTime = 130;
 const stackOffset = 31;
 import { Controller } from "./controller.js";
 const controller = new Controller();
 function generateGame() {
     button.remove();
-    //ADD FUNCTION TO CLEAR THE BOARD
-    //Add timer
     generateGameGeneral();
 }
 function generateGameGeneral() {
@@ -40,13 +39,17 @@ function generateGameGeneral() {
     isSelected = false;
     gameOver = false;
     mouseX = 0;
-    mouseY = 0
+    mouseY = 0;
+    timeElapsed = 0;
+    moveCount = 0;
+    startTime = new Date().getSeconds();
     createSection('freeCell', 4, 0, 0, 0);
     createSection('foundCell', 4, cardSpacing * 4.5, 0, 0);
     createSection('tableauArea', 8, 25, 145, 1);
     createMover();
     createWoodPanel();
     createButtons();
+    addTimerAndMoveCounter();
     startGame();
     requestAnimationFrame(everyFrame);
 }
@@ -126,10 +129,26 @@ function createButtons() {
     mainDiv.append(buttonNew);
     mainDiv.append(buttonUndo);
 }
+
+function addTimerAndMoveCounter() {
+    const mainDiv = document.getElementById('otherFeatures');
+    const timeText = document.createElement('p');
+    timeText.setAttribute('id', "timer");
+    timeText.innerHTML = `Time: ${timeElapsed}`;
+    timeText.setAttribute('style', "position: absolute; top: 0px; ");
+    mainDiv.append(timeText);
+
+    const moveText = document.createElement('p');
+    moveText.setAttribute('id', "moveCounter");
+    moveText.innerHTML = `Moves: ${moveCount}`;
+    moveText.setAttribute('style', "position: absolute ; top: 80px;");
+    mainDiv.append(moveText);
+}
 function newGame() {
     if (isMoving) return;
     if (isSelected) return;
     svgElement.innerHTML = '';
+    document.getElementById('otherFeatures').innerHTML='';
     generateGameGeneral();
 }
 function getCard(element, x, y) {
@@ -345,9 +364,15 @@ function undo() {
         prepareAnimate(false, mover);
     }
 }
+function trackTime(){
+    timeElapsed = new Date().getSeconds()-startTime;
+    const element = document.getElementById('timer');
+    element.innerHTML = `Time: ${timeElapsed}`;
+}
 
 function everyFrame() {
     if (gameOver) return;
+    trackTime();
     gameOver = checkGameProgress();
     if (gameOver && !isMoving && !isSelected) loadGameOverScreen();
     else requestAnimationFrame(everyFrame);
