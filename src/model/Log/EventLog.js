@@ -7,10 +7,10 @@ export class EventLog{
     }
     reverse(){
         if (this.events.length>0){
-            return events.pop();
+            return this.events.pop();
         }
         return null;
     }
    
 }
-EventLog.LOG = new EventLog();
+//EventLog.LOG = new EventLog();

@@ -96,14 +96,14 @@ function createWoodPanel() {
 function createButtons() {
     const mainDiv = document.getElementById('background');
 
-    const button = document.createElement('button');
-    button.setAttribute('id', "undoButton");
-    button.setAttribute('class', "startButton");
-    button.setAttribute('style', "position: absolute;");
-    button.innerHTML = 'Undo'
+    const buttonUndo = document.createElement('button');
+    buttonUndo.setAttribute('id', "undoButton");
+    buttonUndo.setAttribute('class', "startButton");
+    buttonUndo.setAttribute('style', "position: absolute;");
+    buttonUndo.innerHTML = 'Undo'
+    buttonUndo.addEventListener("click", undo);
 
-
-    mainDiv.append(button);
+    mainDiv.append(buttonUndo);
 }
 function getCard(element, x, y) {
     return { 'color': element.getAttribute('color'), 'type': element.getAttribute('suit'), 'num': element.getAttribute('number'), 'x': x, 'y': y };
@@ -227,13 +227,15 @@ function animateMover(sX, eX, sY, eY, element) {
 }
 function transportCards(mover) {
     let tempArr = collectCards(mover, 0)
+    let cardPack = new Array();
     for (var i = 0; i < tempArr.length; i++) {
         let currentCard = tempArr[i];
         if (holder != from) {
             let x = from.getAttribute('pos');
             let y = currentCard.getAttribute('y');
             const card = getCard(currentCard, x, y);
-            controller.updateMove(from.getAttribute('id'), holder.getAttribute('id'), card);
+            cardPack.push(card);
+
         }
 
         currentCard.setAttribute('y', holder.children.length)
@@ -241,6 +243,9 @@ function transportCards(mover) {
 
 
         unScale(currentCard, holder.children.length - 1, true, holder.getAttribute('stackable'));
+    }
+    if (holder != from) {
+        controller.updateMove(from.getAttribute('id'), holder.getAttribute('id'), cardPack);
     }
 }
 
@@ -281,7 +286,14 @@ function isOverlapping(e1, X, Y) {
 }
 
 function undo() {
+    if (isMoving) return;
+    if (isSelected) return;
+    const response = controller.handleUndo();
+    if (response['success']) {
+        const thisCardID = response['card'];
+        const thisCard = document.getElementById(thisCardID);
 
+    }
 }
 
 button.addEventListener("click", generateGame);

@@ -6,12 +6,13 @@ import { Section } from "../model/Section.js";
 import { Vector2 } from "../model/Vector2.js";
 import { Event } from "../model/Log/Event.js";
 import { EventLog } from "../model/Log/EventLog.js";
-const eventLog = EventLog.LOG;
+
 export class Game {
     constructor() {
         this.setUp();
     }
     setUp() {
+        this.eventLog = new EventLog();
         this.tableaus = new Array(Game.TABLEAU_SIZE);
         this.foundations = new Array(Game.FOUNDATION_SIZE);
         this.cells = new Array(Game.FREECELL_SIZE);
@@ -88,16 +89,22 @@ export class Game {
     formCard(card) {
         return new Card(card['color'], card['type'], new Vector2(card['x'], card['y']), card['num']);
     }
-    update(from, to, card) {
+    update(from, to, cards, canLog) {
         var sectionFrom = this.parse(from);
         var sectionTo = this.parse(to);
-        card = this.formCard(card);
-        sectionFrom.remove(this.getIndex(sectionFrom.cards, card));
-        card.setPosition(new Vector2(sectionTo.getNumber(), sectionTo.cards.length))
-        sectionTo.add(card);
-        const event = new Event(card,from, to);
-        eventLog.log(event);
-        
+        for (var card of cards){
+            var cardObject = this.formCard(card);
+            sectionFrom.remove(this.getIndex(sectionFrom.cards, cardObject));
+            cardObject.setPosition(new Vector2(sectionTo.getNumber(), sectionTo.cards.length))
+            sectionTo.add(cardObject);
+        }
+       
+        if (canLog) {
+            const event = new Event(cards, from, to);
+            this.eventLog.log(event);
+        }
+
+
     }
     isValidMove(from, to, card, size) {
         var sectionTo = this.parse(to);
@@ -173,6 +180,14 @@ export class Game {
             else return false;
         }
         return true;
+    }
+    undo() {
+        const event = this.eventLog.reverse();
+        if (event != null) {
+            this.update(event.getNewPos(), event.getOriginalPos(), event.getComponent(), false)
+            return { 'success': true, 'from': event.getOriginalPos(), 'to': event.getNewPos(), 'card': event.getComponent().color + event.getComponent().type + event.getComponent().num + "Holder" } // card is the html not js
+        }
+        else return { 'success': false }
     }
 }
 Game.DECK_SIZE = 52;

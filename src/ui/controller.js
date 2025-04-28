@@ -12,12 +12,12 @@ export class Controller {
         return this.game.canSelect(card, section, size);
     }
     updateMove(from, to, card) {
-        this.game.update(from, to, card)
+        this.game.update(from, to, card, true)
     }
     validateMove(from, to, card, size) {
         return this.game.isValidMove(from, to, card, size)
     }
-    handleUndo(){
-        
+    handleUndo() {
+        return this.game.undo();
     }
 }
