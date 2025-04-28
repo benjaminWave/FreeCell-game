@@ -1,26 +1,25 @@
-//  unndo
 // maybe make dragging only left click?
 // add an option to auto assign if foundation can be played
 //fix document sizing
 var button = document.getElementById('startButton')
 var svgElement = document.getElementById('gameSVG')
 var svgNS = "http://www.w3.org/2000/svg";
-const htmlNS = "http://www.w3.org/1999/xhtml";
 var cardScale = 0.4
 var cardSpacing = 100;
 const placeHolderIMG = '../imgs/placeholder.png';
 const cardFolder = '../imgs/cards/';
-var draggedCard = null;
+var draggedCard;
 
-var mouseX = 0;
-var mouseY = 0
+var mouseX;
+var mouseY;
 
 var scaleX = 0.4;
 var scaleY = 0.4;
-var holder = null;
-var from = null;
-var isMoving = false;
-var isSelected = false;
+var holder;
+var from;
+var isMoving;
+var isSelected;
+var gameOver;
 const stackOffset = 31;
 import { Controller } from "./controller.js";
 const controller = new Controller();
@@ -28,6 +27,17 @@ function generateGame() {
     button.remove();
     //ADD FUNCTION TO CLEAR THE BOARD
     //Add timer
+    generateGameGeneral();
+}
+function generateGameGeneral() {
+    draggedCard = null;
+    holder = null;
+    from = null;
+    isMoving = false;
+    isSelected = false;
+    gameOver = false;
+    mouseX = 0;
+    mouseY = 0
     createSection('freeCell', 4, 0, 0, 0);
     createSection('foundCell', 4, cardSpacing * 4.5, 0, 0);
     createSection('tableauArea', 8, 25, 145, 1);
@@ -35,6 +45,7 @@ function generateGame() {
     createWoodPanel();
     createButtons();
     startGame();
+    requestAnimationFrame(everyFrame);
 }
 function startGame() {
     const game = controller.start();
@@ -94,16 +105,29 @@ function createWoodPanel() {
     svgElement.appendChild(mainG);
 }
 function createButtons() {
-    const mainDiv = document.getElementById('background');
+    const mainDiv = document.getElementById('otherButtons');
 
     const buttonUndo = document.createElement('button');
     buttonUndo.setAttribute('id', "undoButton");
     buttonUndo.setAttribute('class', "startButton");
-    buttonUndo.setAttribute('style', "position: absolute;");
+    buttonUndo.setAttribute('style', "position: absolute;right:0;");
     buttonUndo.innerHTML = 'Undo'
     buttonUndo.addEventListener("click", undo);
 
+    const buttonNew = document.createElement('button');
+    buttonNew.setAttribute('id', "newButton");
+    buttonNew.setAttribute('class', "startButton");
+    buttonNew.setAttribute('style', "position: absolute; right:0; top: 80px;");
+    buttonNew.innerHTML = 'New Game'
+    buttonNew.addEventListener("click", newGame);
+    mainDiv.append(buttonNew);
     mainDiv.append(buttonUndo);
+}
+function newGame() {
+    if (isMoving) return;
+    if (isSelected) return;
+    svgElement.innerHTML = '';
+    generateGameGeneral();
 }
 function getCard(element, x, y) {
     return { 'color': element.getAttribute('color'), 'type': element.getAttribute('suit'), 'num': element.getAttribute('number'), 'x': x, 'y': y };
@@ -127,10 +151,10 @@ function addCard(color, suit, number, dest) {
     transportCards(mover);
     scaleX = holder.getCTM().a;
     scaleY = holder.getCTM().d;
-    ///INPUT BEGIN
     holdG.addEventListener('mousedown', (event) => {
         if (isMoving) return;
         if (isSelected) return;
+        if (gameOver) return;
         holder = holdG.parentNode
         let x = holder.getAttribute('pos');
         let y = holdG.getAttribute('y');
@@ -153,10 +177,6 @@ function addCard(color, suit, number, dest) {
         mouseY = event.clientY
 
     });
-}
-
-function getIndex(parent, element) {
-    Array.from(parent.children).indexOf(element)
 }
 
 function lerp(a, b, t) {
@@ -196,13 +216,17 @@ function handleMouseUp(event) {
             let y = draggedCard.getAttribute('y');
             const card = getCard(draggedCard, x, y)
             if (!controller.validateMove(from.getAttribute('id'), holder.getAttribute('id'), card, mover.children.length)) holder = from;
-            //else  controller.updateMove(from.getAttribute('id'), holder.getAttribute('id'), card);
         }
-        let offset = (stackOffset) * (holder.children.length - 1) * holder.getAttribute('stackable')
-        const mainDiv = document.getElementById("background").getBoundingClientRect();
-        animateMover(mover.getCTM().e, holder.getBoundingClientRect().x - mainDiv.x, mover.getCTM().f, holder.getBoundingClientRect().y - 19 + offset, mover, true)
-        draggedCard = null;
+        prepareAnimate(true, mover);
+
     }
+}
+
+function prepareAnimate(notify, mover) {
+    let offset = (stackOffset) * (holder.children.length - 1) * holder.getAttribute('stackable')
+    const mainDiv = document.getElementById("background").getBoundingClientRect();
+    animateMover(mover.getCTM().e, holder.getBoundingClientRect().x - mainDiv.x, mover.getCTM().f, holder.getBoundingClientRect().y - 19 + offset, mover, notify)
+    draggedCard = null;
 }
 
 function animateMover(sX, eX, sY, eY, element, canNotify) {
@@ -265,13 +289,12 @@ function moveTo(X, Y, element) {
     const mainDiv = document.getElementById("background").getBoundingClientRect();
     let x = (X + window.scrollX - (mainDiv.x - 8)) - element.getBoundingClientRect().width / 2
     let y = (Y + window.scrollY) - element.getBoundingClientRect().height / 2
-    element.setAttribute('transform', `translate(${x}, ${y})`); // previously x/scaleX
+    element.setAttribute('transform', `translate(${x}, ${y})`);
 }
 function findClosestElement(element, parent, X, Y) {
     const sections = document.getElementsByClassName('section');
 
-    for (var i = 0; i < 16; i++) { //16 spots in the game, for future reference
-        //TEST THIS FOR STACKED SECTIONS
+    for (var i = 0; i < 16; i++) { //16 spots in the game
         let topIndex = sections[i].children.length - 1
         if (isOverlapping(sections[i].children[topIndex], X, Y)) {
             return sections[i];
@@ -288,6 +311,7 @@ function isOverlapping(e1, X, Y) {
 function undo() {
     if (isMoving) return;
     if (isSelected) return;
+    if (gameOver) return;
     var mover = document.getElementById('mover');
     const response = controller.handleUndo();
     if (response['success']) {
@@ -295,8 +319,8 @@ function undo() {
         const cards = response['card'];
         draggedCard = document.getElementById(cards[0]);
         const mainDiv = document.getElementById("background").getBoundingClientRect();
-        const middleX = draggedCard.getBoundingClientRect().x //+ draggedCard.getBoundingClientRect().width / 2
-        const middleY = draggedCard.getBoundingClientRect().y //+ draggedCard.getBoundingClientRect().height / 2
+        const middleX = draggedCard.getBoundingClientRect().x
+        const middleY = draggedCard.getBoundingClientRect().y
         moveTo(middleX, middleY, mover)
         from = document.getElementById(response['to']);
         holder = document.getElementById(response['from']);
@@ -307,12 +331,18 @@ function undo() {
             scale(card, scaleX, scaleY, j)
             mover.appendChild(card);
         }
-
-        let offset = (stackOffset) * (holder.children.length - 1) * holder.getAttribute('stackable')
-        animateMover(mover.getCTM().e, holder.getBoundingClientRect().x - mainDiv.x, mover.getCTM().f, holder.getBoundingClientRect().y - 19 + offset, mover, false)
-        draggedCard = null;
-
+        prepareAnimate(false, mover);
     }
+}
+
+function everyFrame() {
+    if (gameOver) return;
+    gameOver = checkGameProgress();
+    if (gameOver && !isMoving &&!isSelected) console.log("FINISHED");
+    else requestAnimationFrame(everyFrame);
+}
+function checkGameProgress(){
+    return controller.handleCheckGameOver();
 }
 
 button.addEventListener("click", generateGame);

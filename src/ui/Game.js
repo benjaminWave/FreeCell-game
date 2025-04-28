@@ -185,7 +185,7 @@ export class Game {
         const event = this.eventLog.reverse();
         if (event != null) {
             const cards = event.getComponent();
-            
+
             let cardPack = new Array()
             for (var card of cards) {
                 cardPack.push(card.color + card.type + card.num + "Holder")
@@ -194,6 +194,13 @@ export class Game {
             return { 'success': true, 'from': event.getOriginalPos(), 'to': event.getNewPos(), 'card': cardPack } // card is the html not js
         }
         else return { 'success': false }
+    }
+    checkGameOver() {
+        let sum = 0;
+        for (var found of this.foundations) {
+            sum += found.cards.length;
+        }
+        return sum === Game.DECK_SIZE;
     }
 }
 Game.DECK_SIZE = 52;

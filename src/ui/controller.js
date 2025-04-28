@@ -3,9 +3,10 @@ import { Game } from './Game.js';
 export class Controller {
 
     constructor() {
-        this.game = new Game();
+        this.game = null;
     }
     start() {
+        this.game = new Game();
         return this.game;
     }
     canSelect(card, section, size) {
@@ -19,5 +20,8 @@ export class Controller {
     }
     handleUndo() {
         return this.game.undo();
+    }
+    handleCheckGameOver() {
+        return this.game.checkGameOver();
     }
 }
