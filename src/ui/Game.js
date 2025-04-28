@@ -17,7 +17,8 @@ export class Game {
         this.foundations = new Array(Game.FOUNDATION_SIZE);
         this.cells = new Array(Game.FREECELL_SIZE);
         this.cards = new Array(Game.DECK_SIZE);
-        this.sections = { 'foundCell': this.foundations, 'tableauArea': this.tableaus, 'freeCell': this.cells }
+        this.sections = { 'foundCell': this.foundations, 'tableauArea': this.tableaus, 'freeCell': this.cells };
+        this.priorityRanking = ['foundCell', 'tableauArea', 'freeCell'];
         this.cascades = new Array();
         this.createSection('tableauArea', Game.TABLEAU_SIZE);
         this.createSection('foundCell', Game.FOUNDATION_SIZE);
@@ -153,9 +154,7 @@ export class Game {
 
     }
     getIndex(array, card) {
-
         for (var i = 0; i < array.length; i++) {
-
             if (this.cardEquals(array[i], card)) return i;
         }
         return -1;
@@ -201,6 +200,17 @@ export class Game {
             sum += found.cards.length;
         }
         return sum === Game.DECK_SIZE;
+    }
+    findBestMove(from, card, size) {
+        var sectionFrom = this.parse(from);
+        for (var key of this.priorityRanking) {
+            for (var i = 0; i < this.sections[key].length; i++) {
+                let section = this.sections[key][i];
+                let to = `${key}pos${i + 1}`;
+                if (section === sectionFrom) continue;
+                else if (this.isValidMove(from, to, card, size)) return to;
+            }
+        }
     }
 }
 Game.DECK_SIZE = 52;

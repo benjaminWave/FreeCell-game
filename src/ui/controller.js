@@ -24,4 +24,7 @@ export class Controller {
     handleCheckGameOver() {
         return this.game.checkGameOver();
     }
+    handleBestMove(from, card,size) {
+        return this.game.findBestMove(from, card,size);
+    }
 }

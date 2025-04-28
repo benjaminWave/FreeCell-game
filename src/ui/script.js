@@ -20,6 +20,9 @@ var from;
 var isMoving;
 var isSelected;
 var gameOver;
+var start;
+var end;
+const clickTime = 130;
 const stackOffset = 31;
 import { Controller } from "./controller.js";
 const controller = new Controller();
@@ -155,6 +158,7 @@ function addCard(color, suit, number, dest) {
         if (isMoving) return;
         if (isSelected) return;
         if (gameOver) return;
+        start = new Date().getTime();
         holder = holdG.parentNode
         let x = holder.getAttribute('pos');
         let y = holdG.getAttribute('y');
@@ -203,6 +207,8 @@ function handleMouseMove(event) {
 
 function handleMouseUp(event) {
     if (draggedCard) {
+        end = new Date().getTime();
+
         isMoving = true
         isSelected = false;
         var mover = document.getElementById('mover');
@@ -210,12 +216,17 @@ function handleMouseUp(event) {
 
         holder = findClosestElement(draggedCard, holder, mouseX, mouseY);
 
+        let x = from.getAttribute('pos');
+        let y = draggedCard.getAttribute('y');
+        const card = getCard(draggedCard, x, y)
 
         if (holder != from) {
-            let x = from.getAttribute('pos');
-            let y = draggedCard.getAttribute('y');
-            const card = getCard(draggedCard, x, y)
+
             if (!controller.validateMove(from.getAttribute('id'), holder.getAttribute('id'), card, mover.children.length)) holder = from;
+        }
+        else if ((end - start) < clickTime) {
+            var bestPosTag = controller.handleBestMove(from.getAttribute('id'), card, mover.children.length);
+            if (bestPosTag) holder = document.getElementById(bestPosTag);
         }
         prepareAnimate(true, mover);
 
@@ -361,7 +372,7 @@ function loadGameOverScreen() {
     textElement.setAttribute("dominant-baseline", "central");
     for (var i = 0; i < 2; i++) {
         let tspan = document.createElementNS(svgNS, "tspan");
-        tspan.innerHTML = (i==0)?"Game Over!":"Start a new game";
+        tspan.innerHTML = (i == 0) ? "Game Over!" : "Start a new game";
         tspan.setAttribute('x', 200);
         tspan.setAttribute('dy', '1.2em');
         textElement.appendChild(tspan);
