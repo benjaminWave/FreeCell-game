@@ -148,7 +148,7 @@ function addCard(color, suit, number, dest) {
             scale(currentCard, scaleX, scaleY, i)
             mover.appendChild(currentCard);
         }
-        moveToMouse(event, mover)
+        moveTo(event.clientX, event.clientY, mover)
         mouseX = event.clientX
         mouseY = event.clientY
 
@@ -175,7 +175,7 @@ function handleMouseMove(event) {
     if (draggedCard) {
         var mover = document.getElementById('mover');
 
-        moveToMouse(event, mover)
+        moveTo(event.clientX, event.clientY, mover)
         mouseX = event.clientX
         mouseY = event.clientY
     }
@@ -261,10 +261,10 @@ function unScale(element, index, cond, stackable) {
 
 }
 
-function moveToMouse(event, element) {
+function moveTo(X, Y, element) {
     const mainDiv = document.getElementById("background").getBoundingClientRect();
-    let x = (event.clientX + window.scrollX - (mainDiv.x - 8)) - element.getBoundingClientRect().width / 2
-    let y = (event.clientY + window.scrollY) - element.getBoundingClientRect().height / 2
+    let x = (X + window.scrollX - (mainDiv.x - 8)) - element.getBoundingClientRect().width / 2
+    let y = (Y + window.scrollY) - element.getBoundingClientRect().height / 2
     element.setAttribute('transform', `translate(${x}, ${y})`); // previously x/scaleX
 }
 function findClosestElement(element, parent, X, Y) {
@@ -295,11 +295,9 @@ function undo() {
         const cards = response['card'];
         draggedCard = document.getElementById(cards[0]);
         const mainDiv = document.getElementById("background").getBoundingClientRect();
-        const middleX = draggedCard.getBoundingClientRect().x+ draggedCard.getBoundingClientRect().width / 2
-        const middleY = draggedCard.getBoundingClientRect().y+ draggedCard.getBoundingClientRect().height / 2
-        let x = middleX - (mainDiv.x - 8) - draggedCard.getBoundingClientRect().width / 2
-        let y = (middleY) - draggedCard.getBoundingClientRect().height / 2
-        mover.setAttribute('transform', `translate(${x}, ${y})`)
+        const middleX = draggedCard.getBoundingClientRect().x //+ draggedCard.getBoundingClientRect().width / 2
+        const middleY = draggedCard.getBoundingClientRect().y //+ draggedCard.getBoundingClientRect().height / 2
+        moveTo(middleX, middleY, mover)
         from = document.getElementById(response['to']);
         holder = document.getElementById(response['from']);
         for (var j = 0; j < cards.length; j++) {
