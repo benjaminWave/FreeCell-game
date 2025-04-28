@@ -92,13 +92,13 @@ export class Game {
     update(from, to, cards, canLog) {
         var sectionFrom = this.parse(from);
         var sectionTo = this.parse(to);
-        for (var card of cards){
+        for (var card of cards) {
             var cardObject = this.formCard(card);
             sectionFrom.remove(this.getIndex(sectionFrom.cards, cardObject));
             cardObject.setPosition(new Vector2(sectionTo.getNumber(), sectionTo.cards.length))
             sectionTo.add(cardObject);
         }
-       
+
         if (canLog) {
             const event = new Event(cards, from, to);
             this.eventLog.log(event);
@@ -184,8 +184,14 @@ export class Game {
     undo() {
         const event = this.eventLog.reverse();
         if (event != null) {
+            const cards = event.getComponent();
+            
+            let cardPack = new Array()
+            for (var card of cards) {
+                cardPack.push(card.color + card.type + card.num + "Holder")
+            }
             this.update(event.getNewPos(), event.getOriginalPos(), event.getComponent(), false)
-            return { 'success': true, 'from': event.getOriginalPos(), 'to': event.getNewPos(), 'card': event.getComponent().color + event.getComponent().type + event.getComponent().num + "Holder" } // card is the html not js
+            return { 'success': true, 'from': event.getOriginalPos(), 'to': event.getNewPos(), 'card': cardPack } // card is the html not js
         }
         else return { 'success': false }
     }

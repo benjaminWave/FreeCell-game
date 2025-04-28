@@ -200,12 +200,12 @@ function handleMouseUp(event) {
         }
         let offset = (stackOffset) * (holder.children.length - 1) * holder.getAttribute('stackable')
         const mainDiv = document.getElementById("background").getBoundingClientRect();
-        animateMover(mover.getCTM().e, holder.getBoundingClientRect().x - mainDiv.x, mover.getCTM().f, holder.getBoundingClientRect().y - 19 + offset, mover)
+        animateMover(mover.getCTM().e, holder.getBoundingClientRect().x - mainDiv.x, mover.getCTM().f, holder.getBoundingClientRect().y - 19 + offset, mover, true)
         draggedCard = null;
     }
 }
 
-function animateMover(sX, eX, sY, eY, element) {
+function animateMover(sX, eX, sY, eY, element, canNotify) {
     var t = 0;
     var duration = 150;
     let startTime = performance.now();
@@ -216,7 +216,7 @@ function animateMover(sX, eX, sY, eY, element) {
         if (t >= 1) {
             t = 1;
             isMoving = false
-            transportCards(mover)
+            transportCards(mover, canNotify)
         }
         let x = lerp(sX, eX, t);
         let y = lerp(sY, eY, t);
@@ -225,7 +225,7 @@ function animateMover(sX, eX, sY, eY, element) {
     }
     requestAnimationFrame(update);
 }
-function transportCards(mover) {
+function transportCards(mover, canNotify) {
     let tempArr = collectCards(mover, 0)
     let cardPack = new Array();
     for (var i = 0; i < tempArr.length; i++) {
@@ -244,7 +244,7 @@ function transportCards(mover) {
 
         unScale(currentCard, holder.children.length - 1, true, holder.getAttribute('stackable'));
     }
-    if (holder != from) {
+    if (holder != from && canNotify) {
         controller.updateMove(from.getAttribute('id'), holder.getAttribute('id'), cardPack);
     }
 }
@@ -288,10 +288,31 @@ function isOverlapping(e1, X, Y) {
 function undo() {
     if (isMoving) return;
     if (isSelected) return;
+    var mover = document.getElementById('mover');
     const response = controller.handleUndo();
     if (response['success']) {
-        const thisCardID = response['card'];
-        const thisCard = document.getElementById(thisCardID);
+        isMoving = true
+        const cards = response['card'];
+        draggedCard = document.getElementById(cards[0]);
+        const mainDiv = document.getElementById("background").getBoundingClientRect();
+        const middleX = draggedCard.getBoundingClientRect().x+ draggedCard.getBoundingClientRect().width / 2
+        const middleY = draggedCard.getBoundingClientRect().y+ draggedCard.getBoundingClientRect().height / 2
+        let x = middleX - (mainDiv.x - 8) - draggedCard.getBoundingClientRect().width / 2
+        let y = (middleY) - draggedCard.getBoundingClientRect().height / 2
+        mover.setAttribute('transform', `translate(${x}, ${y})`)
+        from = document.getElementById(response['to']);
+        holder = document.getElementById(response['from']);
+        for (var j = 0; j < cards.length; j++) {
+            let cardID = cards[j];
+            let card = document.getElementById(cardID);
+            from.removeChild(card);
+            scale(card, scaleX, scaleY, j)
+            mover.appendChild(card);
+        }
+
+        let offset = (stackOffset) * (holder.children.length - 1) * holder.getAttribute('stackable')
+        animateMover(mover.getCTM().e, holder.getBoundingClientRect().x - mainDiv.x, mover.getCTM().f, holder.getBoundingClientRect().y - 19 + offset, mover, false)
+        draggedCard = null;
 
     }
 }
