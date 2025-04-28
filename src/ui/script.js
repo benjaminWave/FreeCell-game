@@ -242,10 +242,14 @@ function handleMouseUp(event) {
         if (holder != from) {
 
             if (!controller.validateMove(from.getAttribute('id'), holder.getAttribute('id'), card, mover.children.length)) holder = from;
+            else updateMoveCounter(); // case of validation drag
         }
         else if ((end - start) < clickTime) {
             var bestPosTag = controller.handleBestMove(from.getAttribute('id'), card, mover.children.length);
-            if (bestPosTag) holder = document.getElementById(bestPosTag);
+            if (bestPosTag){
+                holder = document.getElementById(bestPosTag);
+                updateMoveCounter(); //case of click
+            } 
         }
         prepareAnimate(true, mover);
 
@@ -299,7 +303,7 @@ function transportCards(mover, canNotify) {
         unScale(currentCard, holder.children.length - 1, true, holder.getAttribute('stackable'));
     }
     if (holder != from && canNotify) {
-        document.getElementById('moveCounter').innerHTML = `Moves: ${++moveCount}`;
+
         controller.updateMove(from.getAttribute('id'), holder.getAttribute('id'), cardPack);
     }
 }
@@ -352,7 +356,7 @@ function undo() {
         const mainDiv = document.getElementById("background").getBoundingClientRect();
         const middleX = draggedCard.getBoundingClientRect().x
         const middleY = draggedCard.getBoundingClientRect().y
-        document.getElementById('moveCounter').innerHTML = `Moves: ${++moveCount}`;
+        updateMoveCounter();
         moveTo(middleX, middleY, mover)
         from = document.getElementById(response['to']);
         holder = document.getElementById(response['from']);
@@ -375,7 +379,9 @@ function trackTime() {
     if (min < 10) min = "0" + min;
     element.innerHTML = `Time: ${min}:${sec}`;
 }
-
+function updateMoveCounter() {
+    document.getElementById('moveCounter').innerHTML = `Moves: ${++moveCount}`;
+}
 function everyFrame() {
     if (gameOver) return;
     trackTime();
