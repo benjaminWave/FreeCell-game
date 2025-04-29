@@ -162,7 +162,7 @@ export class Game {
             if (size < 2) return true; //CHECK FOR SIZE IN CASE FREE CELL OR FOUNDATION CASCADE
             return false;
         }
-        if (this.isWithinMaxCards(size)) return this.isCascade(this.tableaus[card['x'] - 1], card);
+        if (this.isWithinMaxCards(size)) return this.isCascade(this.tableaus[card['x'] - 1], this.formCard(card));
         return false;
 
     }
@@ -176,7 +176,7 @@ export class Game {
         return card1.num === card2.num && card1.suit === card2.suit //&& card1.position.getX() === card2.position.getX() && card1.position.getY() === card2.position.getY();
     }
     isCascade(tab, card) {
-        card = this.formCard(card);
+
         var index = this.getIndex(tab.cards, card);
         if (index === -1) return false;
         var cards = tab.cards;
@@ -231,7 +231,7 @@ export class Game {
             let top = section.getHead();
             if (top) {
                 let num = CardConverter.toNumber(top.getNumber());
-                if (num < lowest) lowest = num+1;
+                if (num < lowest) lowest = num + 1;
             }
             else lowest = 0;
         }
@@ -245,21 +245,41 @@ export class Game {
             }
         }
     }
+    checkFreeCellEmpty() {
+        for (var section of this.cells) {
+            if (!section.isEmpty()) return false;
+        }
+        return true;
+    }
+    allTableausCascades() {
+        for (var section of this.tableaus) {
+            if (section.isEmpty()) continue;
+            else if (this.isCascade(section, section.cards[0]));
+            else return false;
+        }
+        return true;
+    }
+    canAutoAssign() {
+        if (!this.checkFreeCellEmpty()) return false;
+        return this.allTableausCascades();
+    }
 
     autoAssign() {
-        var lowest = this.getLowestNeeded();
-        for (var section of this.tableaus) {
-            let top = section.getHead();
-            if (top) {
-                let num = CardConverter.toNumber(top.getNumber());
-                if (num < lowest + 2) {
-                    let toSection = this.findValidSection(top);
-                    if (toSection) {
-                        let cardPack = new Array();
-                        cardPack.push(top.color + top.suit + top.num + "Holder");
-                        return { 'success': true, 'from': toSection, 'card': cardPack };
-                    }
+        if (this.canAutoAssign()) {
+            var lowest = this.getLowestNeeded();
+            for (var section of this.tableaus) {
+                let top = section.getHead();
+                if (top) {
+                    let num = CardConverter.toNumber(top.getNumber());
+                    if (num < lowest + 2) {
+                        let toSection = this.findValidSection(top);
+                        if (toSection) {
+                            let cardPack = new Array();
+                            cardPack.push(top.color + top.suit + top.num + "Holder");
+                            return { 'success': true, 'from': toSection, 'card': cardPack };
+                        }
 
+                    }
                 }
             }
         }
