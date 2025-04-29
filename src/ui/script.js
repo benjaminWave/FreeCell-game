@@ -26,6 +26,7 @@ const clickTime = 130;
 const stackOffset = 31;
 import { Controller } from "./controller.js";
 const controller = new Controller();
+
 function generateGame() {
     button.remove();
     generateGameGeneral();
@@ -64,7 +65,6 @@ function startGame() {
         }
     }
 }
-
 
 
 function createSection(tag, size, offsetX, offsetY, stackable) {
@@ -150,6 +150,7 @@ function newGame() {
     document.getElementById('otherFeatures').innerHTML = '';
     generateGameGeneral();
 }
+//Returns an object representation of the SVG card
 function getCard(element, x, y) {
     return { 'color': element.getAttribute('color'), 'type': element.getAttribute('suit'), 'num': element.getAttribute('number'), 'x': x, 'y': y };
 }
@@ -170,49 +171,41 @@ function addCard(color, suit, number, dest) {
     scale(holdG, scaleX, scaleY, 0)
     mover.appendChild(holdG);
     transportCards(mover);
-    scaleX = holder.getCTM().a;
-    scaleY = holder.getCTM().d;
+    //START INPUT
     holdG.addEventListener('mousedown', (event) => {
         if (isMoving) return;
         if (isSelected) return;
         if (gameOver) return;
-        start = new Date().getTime();
-        holder = holdG.parentNode
-        let x = holder.getAttribute('pos');
-        let y = holdG.getAttribute('y');
-        var result = controller.canSelect(getCard(holdG, x, y), holder.getAttribute('tag'), holder.children.length - y);
-        if (!result) return;
-        var mover = document.getElementById('mover');
-        isSelected = true;
-        draggedCard = holdG
-        let parent = holdG.parentNode
-        let index = (Array.prototype.indexOf.call(parent.children, holdG));
-        let tempArr = collectCards(parent, index)
-        for (var i = 0; i < tempArr.length; i++) {
-            var currentCard = tempArr[i];
-            parent.removeChild(currentCard);
-            scale(currentCard, scaleX, scaleY, i)
-            mover.appendChild(currentCard);
-        }
-        moveTo(event.clientX, event.clientY, mover)
-        mouseX = event.clientX
-        mouseY = event.clientY
+        handleMouseDown(event, holdG);
 
     });
 }
 
-function lerp(a, b, t) {
-    return a + (b - a) * t;
+function handleMouseDown(event, card) {
+    let holdG = card;
+    start = new Date().getTime();
+    holder = holdG.parentNode
+    let x = holder.getAttribute('pos');
+    let y = holdG.getAttribute('y');
+    var result = controller.canSelect(getCard(holdG, x, y), holder.getAttribute('tag'), holder.children.length - y);
+    if (!result) return;
+    var mover = document.getElementById('mover');
+    isSelected = true;
+    draggedCard = holdG
+    let parent = holdG.parentNode
+    let index = (Array.prototype.indexOf.call(parent.children, holdG));
+    let tempArr = collectCards(parent, index)
+    for (var i = 0; i < tempArr.length; i++) {
+        var currentCard = tempArr[i];
+        parent.removeChild(currentCard);
+        scale(currentCard, scaleX, scaleY, i)
+        mover.appendChild(currentCard);
+    }
+    moveTo(event.clientX, event.clientY, mover)
+    mouseX = event.clientX
+    mouseY = event.clientY
 }
 
-function collectCards(element, start) {
-    let tempArr = [];
-    for (var i = start; i < element.children.length; i++) {
-        var currentCard = element.children[i];
-        tempArr.push(currentCard)
-    }
-    return tempArr;
-}
 function handleMouseMove(event) {
     if (draggedCard) {
         var mover = document.getElementById('mover');
@@ -226,14 +219,11 @@ function handleMouseMove(event) {
 function handleMouseUp(event) {
     if (draggedCard) {
         end = new Date().getTime();
-
         isMoving = true
         isSelected = false;
         var mover = document.getElementById('mover');
         from = holder;
-
         holder = findClosestElement(draggedCard, holder, mouseX, mouseY);
-
         let x = from.getAttribute('pos');
         let y = draggedCard.getAttribute('y');
         const card = getCard(draggedCard, x, y)
@@ -265,10 +255,9 @@ function prepareAnimate(notify, mover) {
 function animateMover(sX, eX, sY, eY, element, canNotify) {
     var t = 0;
     var duration = 150;
-    let startTime = performance.now();
-
+    let startTime = new Date().getTime();
     function update() {
-        let currentTime = performance.now();
+        let currentTime = new Date().getTime();
         t = (currentTime - startTime) / duration;
         if (t >= 1) {
             t = 1;
@@ -297,12 +286,9 @@ function transportCards(mover, canNotify) {
 
         currentCard.setAttribute('y', holder.children.length)
         holder.appendChild(currentCard);
-
-
         unScale(currentCard, holder.children.length - 1, true, holder.getAttribute('stackable'));
     }
     if (holder != from && canNotify) {
-
         controller.updateMove(from.getAttribute('id'), holder.getAttribute('id'), cardPack);
     }
 }
@@ -412,7 +398,6 @@ function loadGameOverScreen() {
     mainG.setAttribute('transform', `translate (${offsetX},${0})`);
     var rect = document.createElementNS(svgNS, 'rect');
     rect.setAttribute('class', 'msgPanel');
-
     var textElement = document.createElementNS(svgNS, "text");
     textElement.setAttribute("x", 200);
     textElement.setAttribute("y", 25);
@@ -431,6 +416,20 @@ function loadGameOverScreen() {
     mainG.appendChild(rect);
     mainG.appendChild(textElement);
     svgElement.appendChild(mainG);
+}
+
+function lerp(a, b, t) {
+    return a + (b - a) * t;
+}
+
+//Helper function to collect an array of cards from a section, element starting at index start
+function collectCards(element, start) {
+    let tempArr = [];
+    for (var i = start; i < element.children.length; i++) {
+        var currentCard = element.children[i];
+        tempArr.push(currentCard)
+    }
+    return tempArr;
 }
 
 button.addEventListener("click", generateGame);
