@@ -102,7 +102,7 @@ function createMover() {
 function createWoodPanel() {
     var mainG = document.createElementNS(svgNS, 'g');
     mainG.setAttribute('id', 'panel');
-    let offsetX = 1243;
+    let offsetX = 1043;
 
     mainG.setAttribute('transform', `translate (${offsetX},${0})`);
     var rect = document.createElementNS(svgNS, 'rect');

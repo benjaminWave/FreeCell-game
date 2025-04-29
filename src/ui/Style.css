@@ -21,7 +21,7 @@ h1 {
 }
 
 .panel{
-    height: 575px;
+    height: 589px;
     width: 400px;
     fill: url(#texture);
     stroke: black;
