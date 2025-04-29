@@ -27,4 +27,7 @@ export class Controller {
     handleBestMove(from, card,size) {
         return this.game.findBestMove(from, card,size);
     }
+    handleAutoAssign(){
+        return this.game.autoAssign();
+    }
 }

@@ -19,6 +19,7 @@ export class Game {
         this.cards = new Array(Game.DECK_SIZE);
         this.sections = { 'foundCell': this.foundations, 'tableauArea': this.tableaus, 'freeCell': this.cells };
         this.priorityRanking = ['foundCell', 'tableauArea', 'freeCell'];
+        //this.assignmentIndex = {'0':'HEARTS','1':'DIAMONDS',2:''}
         this.cascades = new Array();
         this.createSection('tableauArea', Game.TABLEAU_SIZE);
         this.createSection('foundCell', Game.FOUNDATION_SIZE);
@@ -87,8 +88,15 @@ export class Game {
         else if (prefix == "freeCell") return this.cells[number - 1];
         else return this.tableaus[number - 1];
     }
+    reverseParse(term, index) {
+        return `${term.getType()}pos${index + 1}`
+    }
+
     formCard(card) {
         return new Card(card['color'], card['type'], new Vector2(card['x'], card['y']), card['num']);
+    }
+    reformCard(card) {
+        return { 'color': card.color, 'num': card.num, 'type': card.suit, 'x': card.position.x, 'y': card.position.y }
     }
     update(from, to, cards, canLog) {
         var sectionFrom = this.parse(from);
@@ -113,7 +121,6 @@ export class Game {
         var desiredColor = card.color;
         var desiredSuit = card.suit;
         var desiredNumber = CardConverter.toNumber(card.num);
-
         var valid = true;
         const type = sectionTo.getType();
         if (type === "foundCell") {
@@ -122,7 +129,12 @@ export class Game {
                 var destCard = sectionTo.getHead()
                 valid = (destCard.color === desiredColor && destCard.suit === desiredSuit && CardConverter.toNumber(destCard.num) === desiredNumber - 1)
             }
-            else valid = (desiredNumber < 1);
+            else {
+                valid = (desiredNumber < 1);
+                if (valid) {
+                    //reassign(sectionTo);
+                }
+            }
         }
         else if (type === "freeCell") {
             if (size > 1) valid = false;
@@ -138,6 +150,7 @@ export class Game {
 
         return valid;
     }
+
     isWithinMaxCards(size) {
         const m = this.getEmptySections('tableauArea')
         const n = this.getEmptySections('freeCell')
@@ -211,6 +224,46 @@ export class Game {
                 else if (this.isValidMove(from, to, card, size)) return to;
             }
         }
+    }
+    getLowestNeeded() {
+        var lowest = Number.MAX_VALUE;
+        for (var section of this.foundations) {
+            let top = section.getHead();
+            if (top) {
+                let num = CardConverter.toNumber(top.getNumber());
+                if (num < lowest) lowest = num+1;
+            }
+            else lowest = 0;
+        }
+        return lowest;
+    }
+    findValidSection(card) {
+        for (var i = 0; i < this.foundations.length; i++) {
+            var section = this.foundations[i];
+            if (this.isValidMove(null, this.reverseParse(section, i), this.reformCard(card), 1)) {
+                return this.reverseParse(section, i);
+            }
+        }
+    }
+
+    autoAssign() {
+        var lowest = this.getLowestNeeded();
+        for (var section of this.tableaus) {
+            let top = section.getHead();
+            if (top) {
+                let num = CardConverter.toNumber(top.getNumber());
+                if (num < lowest + 2) {
+                    let toSection = this.findValidSection(top);
+                    if (toSection) {
+                        let cardPack = new Array();
+                        cardPack.push(top.color + top.suit + top.num + "Holder");
+                        return { 'success': true, 'from': toSection, 'card': cardPack };
+                    }
+
+                }
+            }
+        }
+        return { 'success': false }
     }
 }
 Game.DECK_SIZE = 52;

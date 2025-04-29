@@ -10,7 +10,6 @@ var draggedCard;
 
 var mouseX;
 var mouseY;
-
 var scaleX = 0.4;
 var scaleY = 0.4;
 var holder;
@@ -246,10 +245,10 @@ function handleMouseUp(event) {
         }
         else if ((end - start) < clickTime) {
             var bestPosTag = controller.handleBestMove(from.getAttribute('id'), card, mover.children.length);
-            if (bestPosTag){
+            if (bestPosTag) {
                 holder = document.getElementById(bestPosTag);
                 updateMoveCounter(); //case of click
-            } 
+            }
         }
         prepareAnimate(true, mover);
 
@@ -342,7 +341,16 @@ function isOverlapping(e1, X, Y) {
     return (X > rect2.left && X < rect2.right && Y < rect2.bottom && Y > rect2.top)
 
 }
-
+function tryAutoAssign() {
+    if (isMoving) return;
+    if (isSelected) return;
+    if (gameOver) return;
+    var mover = document.getElementById('mover');
+    const response = controller.handleAutoAssign();
+    if (response['success']) {
+        handleAutoMover(true, mover, response, true);
+    }
+}
 function undo() {
     if (isMoving) return;
     if (isSelected) return;
@@ -350,25 +358,27 @@ function undo() {
     var mover = document.getElementById('mover');
     const response = controller.handleUndo();
     if (response['success']) {
-        isMoving = true
-        const cards = response['card'];
-        draggedCard = document.getElementById(cards[0]);
-        const mainDiv = document.getElementById("background").getBoundingClientRect();
-        const middleX = draggedCard.getBoundingClientRect().x
-        const middleY = draggedCard.getBoundingClientRect().y
-        updateMoveCounter();
-        moveTo(middleX, middleY, mover)
-        from = document.getElementById(response['to']);
-        holder = document.getElementById(response['from']);
-        for (var j = 0; j < cards.length; j++) {
-            let cardID = cards[j];
-            let card = document.getElementById(cardID);
-            from.removeChild(card);
-            scale(card, scaleX, scaleY, j)
-            mover.appendChild(card);
-        }
-        prepareAnimate(false, mover);
+        handleAutoMover(false, mover, response, false);
     }
+}
+function handleAutoMover(cond, mover, response, specifyFrom) {
+    isMoving = true
+    const cards = response['card'];
+    draggedCard = document.getElementById(cards[0]);
+    const middleX = draggedCard.getBoundingClientRect().x
+    const middleY = draggedCard.getBoundingClientRect().y
+    updateMoveCounter();
+    moveTo(middleX, middleY, mover)
+    from = (specifyFrom) ? draggedCard.parentNode : document.getElementById(response['to']);
+    holder = document.getElementById(response['from']);
+    for (var j = 0; j < cards.length; j++) {
+        let cardID = cards[j];
+        let card = document.getElementById(cardID);
+        from.removeChild(card);
+        scale(card, scaleX, scaleY, j)
+        mover.appendChild(card);
+    }
+    prepareAnimate(cond, mover);
 }
 function trackTime() {
     timeElapsed = new Date().getTime() - startTime;
@@ -382,12 +392,15 @@ function trackTime() {
 function updateMoveCounter() {
     document.getElementById('moveCounter').innerHTML = `Moves: ${++moveCount}`;
 }
+
 function everyFrame() {
     if (gameOver) return;
+    tryAutoAssign();
     trackTime();
     gameOver = checkGameProgress();
     if (gameOver && !isMoving && !isSelected) loadGameOverScreen();
     else requestAnimationFrame(everyFrame);
+
 }
 function checkGameProgress() {
     return controller.handleCheckGameOver();
