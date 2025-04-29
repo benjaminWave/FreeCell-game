@@ -1,4 +1,4 @@
-
+//TODO ALLOW UNDOING OF AUTO ASSIGNMENT
 var button = document.getElementById('startButton')
 var svgElement = document.getElementById('gameSVG')
 var svgNS = "http://www.w3.org/2000/svg";
@@ -22,6 +22,7 @@ var end;
 var timeElapsed;
 var startTime;
 var moveCount;
+var canAutoAssign;
 const clickTime = 130;
 const stackOffset = 31;
 import { Controller } from "./controller.js";
@@ -42,6 +43,7 @@ function generateGameGeneral() {
     mouseY = 0;
     timeElapsed = 0;
     moveCount = 0;
+    canAutoAssign = true;
     startTime = new Date().getTime();
     createSection('freeCell', 4, 0, 0, 0);
     createSection('foundCell', 4, cardSpacing * 4.5, 0, 0);
@@ -283,13 +285,12 @@ function transportCards(mover, canNotify) {
             cardPack.push(card);
 
         }
-
         currentCard.setAttribute('y', holder.children.length)
         holder.appendChild(currentCard);
         unScale(currentCard, holder.children.length - 1, true, holder.getAttribute('stackable'));
     }
     if (holder != from && canNotify) {
-        controller.updateMove(from.getAttribute('id'), holder.getAttribute('id'), cardPack);
+        controller.updateMove(from.getAttribute('id'), holder.getAttribute('id'), cardPack); //notify game of movement
     }
 }
 
@@ -307,13 +308,12 @@ function unScale(element, index, cond, stackable) {
 
 function moveTo(X, Y, element) {
     const mainDiv = document.getElementById("background").getBoundingClientRect();
-    let x = (X + window.scrollX - (mainDiv.x - 8)) - element.getBoundingClientRect().width / 2
-    let y = (Y + window.scrollY) - element.getBoundingClientRect().height / 2
+    let x = (X + window.scrollX*0 - (mainDiv.x - 0)) - element.getBoundingClientRect().width / 2
+    let y = (Y + window.scrollY*0) - element.getBoundingClientRect().height / 2
     element.setAttribute('transform', `translate(${x}, ${y})`);
 }
 function findClosestElement(element, parent, X, Y) {
     const sections = document.getElementsByClassName('section');
-
     for (var i = 0; i < 16; i++) { //16 spots in the game
         let topIndex = sections[i].children.length - 1
         if (isOverlapping(sections[i].children[topIndex], X, Y)) {
