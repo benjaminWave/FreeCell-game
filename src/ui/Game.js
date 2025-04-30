@@ -7,6 +7,7 @@ import { Vector2 } from "../model/Vector2.js";
 import { Event } from "../model/Log/Event.js";
 import { EventLog } from "../model/Log/EventLog.js";
 
+
 export class Game {
     constructor() {
         this.setUp();
