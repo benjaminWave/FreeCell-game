@@ -1,15 +1,15 @@
-//TODO ALLOW UNDOING OF AUTO ASSIGNMENT
+
+import { createSection } from './ui.js';
 var button = document.getElementById('startButton')
 var svgElement = document.getElementById('gameSVG')
 var svgDef = document.getElementById('svg-defs');
 svgElement.removeChild(svgDef);
 var svgNS = "http://www.w3.org/2000/svg";
-var cardScale = 0.4
+
 var cardSpacing = 100;
-const placeHolderIMG = '../imgs/placeholder.png';
+
 const cardFolder = '../imgs/cards/';
 var draggedCard;
-
 var mouseX;
 var mouseY;
 var scaleX = 0.4;
@@ -54,7 +54,7 @@ function generateGameGeneral() {
     createMover();
     createWoodPanel();
     createButtons();
-    addTimerAndMoveCounter();
+    addMisc();
     startGame();
     requestAnimationFrame(everyFrame);
 }
@@ -72,29 +72,7 @@ function startGame() {
 }
 
 
-function createSection(tag, size, offsetX, offsetY, stackable) {
-    var mainG = document.createElementNS(svgNS, 'g')
-    mainG.setAttribute('id', tag);
 
-    offsetX = offsetX + 55;
-    offsetY = offsetY + 15;
-    mainG.setAttribute('transform', `translate (${offsetX},${offsetY})`);
-    svgElement.appendChild(mainG);
-    for (var i = 1; i <= size; i++) {
-        var newG = document.createElementNS(svgNS, 'g');
-        newG.setAttribute('id', tag + 'pos' + i);
-        newG.setAttribute('pos', i);
-        newG.setAttribute('tag', tag);
-        newG.setAttribute('stackable', stackable);
-        newG.setAttribute('class', 'section')
-        newG.setAttribute('transform', `translate (${cardSpacing * (i - 1)},0) scale(${cardScale},${cardScale})`);
-        var img = document.createElementNS(svgNS, 'image');
-        img.setAttribute('href', placeHolderIMG);
-        newG.appendChild(img);
-        mainG.appendChild(newG);
-    }
-
-}
 function createMover() {
     var mainG = document.createElementNS(svgNS, 'g')
     mainG.setAttribute('id', 'mover');
@@ -132,24 +110,20 @@ function createButtons() {
     mainDiv.append(buttonNew);
     mainDiv.append(buttonUndo);
 
-    
-}
-function enableAutoAssign(){
-    const buttonAssign = document.getElementById('assignButton');
-    if (canAutoAssign){
-        buttonAssign.innerHTML = 'Enable'
-        canAutoAssign = false;
-    } 
-    else{
-        buttonAssign.innerHTML = 'Disable'
-        canAutoAssign = true;
-    }
+    const buttonReport = document.createElement('button');
+    buttonReport.setAttribute('id', "reportButton");
+    buttonReport.setAttribute('class', "startButton");
+    buttonReport.setAttribute('style', "position: absolute; right:0; top: 160px;");
+    buttonReport.innerHTML = 'Report Bug'
+    mainDiv.append(buttonReport);
 }
 
-function addTimerAndMoveCounter() {
+
+function addMisc() {
     const mainDiv = document.getElementById('otherFeatures');
     const timeText = document.createElement('p');
     timeText.setAttribute('id', "timer");
+    timeText.setAttribute('class', "startText");
     timeText.innerHTML = `Time: ${timeElapsed}`;
     timeText.setAttribute('style', "position: absolute; top: 0px; ");
     mainDiv.append(timeText);
@@ -157,20 +131,34 @@ function addTimerAndMoveCounter() {
     const moveText = document.createElement('p');
     moveText.setAttribute('id', "moveCounter");
     moveText.innerHTML = `Moves: ${moveCount}`;
+    moveText.setAttribute('class', "startText");
     moveText.setAttribute('style', "position: absolute ; top: 80px;");
     mainDiv.append(moveText);
 
-    const textAssign = document.createElement('p');
-    textAssign.setAttribute('style', "position: absolute; right:0; top: 187px;font-size:13px;");
+    
+    /*const textAssign = document.createElement('p');
+    textAssign.setAttribute('style', "position: absolute; right:0; top: 267px;font-size:13px;");
     textAssign.innerHTML = 'Toggle Auto Assign'
     const buttonAssign = document.createElement('button');
     buttonAssign.setAttribute('id', "assignButton");
     buttonAssign.setAttribute('class', "startButton");
-    buttonAssign.setAttribute('style', "position: absolute; right:0; top: 160px;");
+    buttonAssign.setAttribute('style', "position: absolute; right:0; top: 240px;");
     buttonAssign.innerHTML = 'Disable'
     buttonAssign.addEventListener("click", enableAutoAssign);
     mainDiv.append(textAssign);
-    mainDiv.append(buttonAssign);
+    mainDiv.append(buttonAssign);*/
+}
+
+function enableAutoAssign() {
+    const buttonAssign = document.getElementById('assignButton');
+    if (canAutoAssign) {
+        buttonAssign.innerHTML = 'Enable'
+        canAutoAssign = false;
+    }
+    else {
+        buttonAssign.innerHTML = 'Disable'
+        canAutoAssign = true;
+    }
 }
 function newGame() {
     if (isMoving) return;
