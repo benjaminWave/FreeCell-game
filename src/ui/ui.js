@@ -68,13 +68,13 @@ export function createButtons() {
     mainDiv.append(buttonNew);
     mainDiv.append(buttonUndo);
 
-    const buttonReport = document.createElement('button');
+   /* const buttonReport = document.createElement('button');
     buttonReport.setAttribute('id', "reportButton");
     buttonReport.setAttribute('class', "startButton");
     buttonReport.setAttribute('style', "position: absolute; right:0; top: 160px;");
     buttonReport.innerHTML = 'Report Bug'
     buttonReport.addEventListener("click", reportBug);
-    mainDiv.append(buttonReport);
+    mainDiv.append(buttonReport);*/
 }
 
  export function addMisc() {
