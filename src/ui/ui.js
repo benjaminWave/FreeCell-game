@@ -1,4 +1,4 @@
-import { newGame, undo,enableAutoAssign } from './script.js';
+import { newGame, undo,enableAutoAssign,reportBug } from './script.js';
 var cardScale = 0.4
 var svgElement = document.getElementById('gameSVG');
 const placeHolderIMG = '../imgs/placeholder.png';
@@ -6,6 +6,7 @@ var svgNS = "http://www.w3.org/2000/svg";
 var cardSpacing = 100;
 var svgDef = document.getElementById('svg-defs');
 svgElement.removeChild(svgDef);
+
 export function createSection(tag, size, offsetX, offsetY, stackable) {
     var mainG = document.createElementNS(svgNS, 'g')
     mainG.setAttribute('id', tag);
@@ -72,6 +73,7 @@ export function createButtons() {
     buttonReport.setAttribute('class', "startButton");
     buttonReport.setAttribute('style', "position: absolute; right:0; top: 160px;");
     buttonReport.innerHTML = 'Report Bug'
+    buttonReport.addEventListener("click", reportBug);
     mainDiv.append(buttonReport);
 }
 
@@ -103,4 +105,32 @@ export function createButtons() {
     buttonAssign.addEventListener("click", enableAutoAssign);
     mainDiv.append(textAssign);
     mainDiv.append(buttonAssign);*/
+}
+
+
+export function loadGameOverScreen() {
+    var mainG = document.createElementNS(svgNS, 'g');
+    mainG.setAttribute('id', 'msg');
+    let offsetX = 300;
+    mainG.setAttribute('transform', `translate (${offsetX},${0})`);
+    var rect = document.createElementNS(svgNS, 'rect');
+    rect.setAttribute('class', 'msgPanel');
+    var textElement = document.createElementNS(svgNS, "text");
+    textElement.setAttribute("x", 200);
+    textElement.setAttribute("y", 25);
+    textElement.setAttribute("font-size", "37");
+    textElement.setAttribute("fill", 'white');
+    textElement.setAttribute("text-anchor", "middle");
+    textElement.setAttribute("dominant-baseline", "central");
+    for (var i = 0; i < 2; i++) {
+        let tspan = document.createElementNS(svgNS, "tspan");
+        tspan.innerHTML = (i == 0) ? "Game Over!" : "Start a new game";
+        tspan.setAttribute('x', 200);
+        tspan.setAttribute('dy', '1.2em');
+        textElement.appendChild(tspan);
+    }
+
+    mainG.appendChild(rect);
+    mainG.appendChild(textElement);
+    svgElement.appendChild(mainG);
 }
