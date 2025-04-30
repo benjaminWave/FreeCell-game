@@ -1,11 +1,6 @@
-//const { CardNumber } = require("./dist/CardNumber");
-//import sharp from 'sharp';
-
-import * as A from "../../dist/CardNumber.js";
-const CardNumber = exports.CardNumber
+import { CardNumber } from "../CardNumberMISC.js";
 const width = 216;
 const height = 311;
-//import { CardNumber } from "./src/model/CardNumber.ts";
 const clubPath = "M641 1670 c-93 -34 -167 -103 -218 -201 -26 -49 -28 -63 -28 -164 0 -98 3 -116 26 -161 l25 -52 -86 -4 c-69 -3 -98 -10 -144 -32 -73 -36 -146 -109 -183 -183 -26 -53 -28 -67 -28 -168 0 -101 2 -114 29 -167 70 -138 199 -218 351 -218 126 0 223 47 308 148 34 42 34 33 -3 -72 -42 -117 -87 -216 -143 -308 -26 -42 -47 -78 -47 -80 0 -2 124 -3 275 -3 151 0 275 1 275 2 0 1 -20 33 -44 70 -70 109 -149 280 -170 367 -7 27 -4 25 39 -22 59 -66 164 -120 251 -128 159 -17 315 70 386 214 31 62 33 73 33 172 0 99 -2 110 -33 172 -67 136 -187 211 -339 212 -46 1 -83 1 -83 2 0 0 15 30 33 65 30 61 32 70 32 174 0 101 -2 115 -28 168 -37 74 -107 144 -183 181 -79 40 -219 47 -303 16z"
 const spadePath = "M746 1662 c-57 -79 -284 -338 -426 -486 -222 -230 -293 -345 -307 -491 -27 -289 327 -465 644 -320 31 14 59 25 63 25 14 0 -9 -88 -36 -142 -15 -29 -54 -95 -86 -146 -33 -52 -58 -96 -55 -98 2 -2 118 -3 256 -2 l253 3 -67 100 c-79 118 -121 197 -130 248 -4 20 -5 37 -2 37 2 0 34 -11 71 -25 193 -73 380 -47 506 71 27 25 62 72 77 103 25 49 28 67 27 146 -1 162 -61 267 -288 505 -81 85 -214 233 -294 327 -101 119 -153 173 -167 173 -11 0 -29 -13 -39 -28z";
 const heartPath = "M327 1670 c-199 -50 -329 -245 -314 -468 15 -212 117 -387 432 -742 176 -198 257 -303 298 -387 17 -35 34 -63 37 -63 3 0 22 33 42 73 50 96 106 168 288 372 319 358 422 533 437 747 20 294 -216 526 -474 465 -114 -26 -222 -112 -271 -214 -9 -18 -18 -33 -21 -33 -3 0 -17 21 -31 48 -78 148 -271 240 -423 202z"
@@ -44,7 +39,7 @@ function generateCard(color, suit, number) {
     textElement.setAttribute("fill", color);
     textElement.setAttribute("text-anchor", "middle");
     textElement.setAttribute("dominant-baseline", "central");
-    textElement.innerHTML = numberList[CardNumber[number]];
+    textElement.innerHTML = numberList[number];
     mainGElement.appendChild(textElement);
 
     textElement = document.createElementNS(svgNS, "text");
@@ -55,7 +50,7 @@ function generateCard(color, suit, number) {
     textElement.setAttribute("text-anchor", "middle");
     textElement.setAttribute("dominant-baseline", "central");
     textElement.setAttribute("transform", "rotate(180,180,265)");
-    textElement.innerHTML = numberList[CardNumber[number]];
+    textElement.innerHTML = numberList[number];
     mainGElement.appendChild(textElement);
 
     var tempGElement = document.createElementNS(svgNS, 'g');
@@ -84,15 +79,16 @@ function generateCard(color, suit, number) {
     pathElement.setAttribute('d', paths[suit]);
     tempGElement.appendChild(pathElement);
     mainGElement.appendChild(tempGElement);
-    const fileName = color+suit+number+".png"
-    createImage(new XMLSerializer().serializeToString(svgElement),fileName);
+    const fileName = color + suit + CardNumber[number] + ".png"
+
+    createImage(new XMLSerializer().serializeToString(svgElement), fileName);
 
 }
-async function createImage(sentSvg,fileName) {
-    await fetch('http://localhost:3001/convert', {
+async function createImage(sentSvg, fileName) {
+    await fetch('http://localhost:5000/convert', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ svg: sentSvg, name:fileName }),
+        body: JSON.stringify({ svg: sentSvg, name: fileName }),
     })
         .then(response => response.text())
         .then(message => console.log(message))
@@ -106,8 +102,8 @@ function generateCards() {
         var color = 'RED';
         if (suit === 'CLUBS' || suit === 'SPADES') color = 'BLACK';
         for (var i = 0; i < 13; i++) {
-            var number = CardNumber[i];
-            generateCard(color,suit,number);
+            var number = i;
+            generateCard(color, suit, number);
 
         }
     }

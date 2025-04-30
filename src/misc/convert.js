@@ -1,9 +1,9 @@
 const express = require('express');
 const sharp = require('sharp');
 const app = express();
-const port = 3001;
-
-app.use((req, res, next) => {
+const port = 5000;
+const path = require('path');
+/*app.use((req, res, next) => {
     res.header("Access-Control-Allow-Origin", "*");
     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     if (req.method === 'OPTIONS') {
@@ -11,11 +11,9 @@ app.use((req, res, next) => {
         return res.status(200).json({});
     }
     next();
-});
-app.use(express.json());
-const fs = require('fs');
-const path = require('path');
+});*/
 
+const fs = require('fs');
 app.use(express.json());
 
 app.post('/convert', async (req, res) => {
@@ -36,6 +34,10 @@ app.post('/convert', async (req, res) => {
     }
 });
 
+app.use(express.static(path.join(__dirname)));
 app.listen(port, () => {
-    console.log(`Server running on port ${port}`);
+    console.log(`Server is running on http://localhost:${port}`);
+});
+app.get('/', (req, res) => {
+    res.sendFile(__dirname + '/scripts/SVGFile.html');
 });
