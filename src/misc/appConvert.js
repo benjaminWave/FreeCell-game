@@ -3,8 +3,9 @@ const app = express();
 const port = 5000;
 
 const path = require('path');
-const convertHandler = require(__dirname +'/scripts/convert.js');
 app.use(express.static(path.join(__dirname)));
+const convertHandler = require(__dirname +'/scripts/convert.js');
+
 app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);
 });

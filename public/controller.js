@@ -1,5 +1,5 @@
 
-import { Game } from './game.js';
+import { Game } from '../src/ui/game.js';
 export class Controller {
 
     constructor() {

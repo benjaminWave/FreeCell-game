@@ -4,7 +4,7 @@ var button = document.getElementById('startButton')
 var svgElement = document.getElementById('gameSVG')
 var svgNS = "http://www.w3.org/2000/svg";
 var cardSpacing = 100;
-const cardFolder = '../imgs/cards/';
+const cardFolder = '../src/imgs/cards/';
 var draggedCard;
 var mouseX;
 var mouseY;

@@ -1,7 +1,7 @@
 import { newGame, undo,enableAutoAssign,reportBug } from './script.js';
 var cardScale = 0.4
 var svgElement = document.getElementById('gameSVG');
-const placeHolderIMG = '../imgs/placeholder.png';
+const placeHolderIMG = '../src/imgs/placeholder.png';
 var svgNS = "http://www.w3.org/2000/svg";
 var cardSpacing = 100;
 var svgDef = document.getElementById('svg-defs');
