@@ -1,13 +1,9 @@
 
-import { createSection } from './ui.js';
+import { createSection, createMover,createWoodPanel,createButtons,addMisc } from './ui.js';
 var button = document.getElementById('startButton')
 var svgElement = document.getElementById('gameSVG')
-var svgDef = document.getElementById('svg-defs');
-svgElement.removeChild(svgDef);
 var svgNS = "http://www.w3.org/2000/svg";
-
 var cardSpacing = 100;
-
 const cardFolder = '../imgs/cards/';
 var draggedCard;
 var mouseX;
@@ -47,7 +43,6 @@ function generateGameGeneral() {
     moveCount = 0;
     canAutoAssign = true;
     startTime = new Date().getTime();
-
     createSection('freeCell', 4, 0, 0, 0);
     createSection('foundCell', 4, cardSpacing * 4.5, 0, 0);
     createSection('tableauArea', 8, 25, 145, 1);
@@ -71,106 +66,6 @@ function startGame() {
     }
 }
 
-
-
-function createMover() {
-    var mainG = document.createElementNS(svgNS, 'g')
-    mainG.setAttribute('id', 'mover');
-    mainG.setAttribute('stackable', 1);
-    svgElement.appendChild(mainG);
-}
-
-function createWoodPanel() {
-    svgElement.appendChild(svgDef);
-    var mainG = document.createElementNS(svgNS, 'g');
-    mainG.setAttribute('id', 'panel');
-    let offsetX = 1043;
-    mainG.setAttribute('transform', `translate (${offsetX},${0})`);
-    var rect = document.createElementNS(svgNS, 'rect');
-    rect.setAttribute('class', 'panel');
-    mainG.appendChild(rect);
-    svgElement.appendChild(mainG);
-}
-function createButtons() {
-    const mainDiv = document.getElementById('otherButtons');
-
-    const buttonUndo = document.createElement('button');
-    buttonUndo.setAttribute('id', "undoButton");
-    buttonUndo.setAttribute('class', "startButton");
-    buttonUndo.setAttribute('style', "position: absolute;right:0;");
-    buttonUndo.innerHTML = 'Undo'
-    buttonUndo.addEventListener("click", undo);
-
-    const buttonNew = document.createElement('button');
-    buttonNew.setAttribute('id', "newButton");
-    buttonNew.setAttribute('class', "startButton");
-    buttonNew.setAttribute('style', "position: absolute; right:0; top: 80px;");
-    buttonNew.innerHTML = 'New Game'
-    buttonNew.addEventListener("click", newGame);
-    mainDiv.append(buttonNew);
-    mainDiv.append(buttonUndo);
-
-    const buttonReport = document.createElement('button');
-    buttonReport.setAttribute('id', "reportButton");
-    buttonReport.setAttribute('class', "startButton");
-    buttonReport.setAttribute('style', "position: absolute; right:0; top: 160px;");
-    buttonReport.innerHTML = 'Report Bug'
-    mainDiv.append(buttonReport);
-}
-
-
-function addMisc() {
-    const mainDiv = document.getElementById('otherFeatures');
-    const timeText = document.createElement('p');
-    timeText.setAttribute('id', "timer");
-    timeText.setAttribute('class', "startText");
-    timeText.innerHTML = `Time: ${timeElapsed}`;
-    timeText.setAttribute('style', "position: absolute; top: 0px; ");
-    mainDiv.append(timeText);
-
-    const moveText = document.createElement('p');
-    moveText.setAttribute('id', "moveCounter");
-    moveText.innerHTML = `Moves: ${moveCount}`;
-    moveText.setAttribute('class', "startText");
-    moveText.setAttribute('style', "position: absolute ; top: 80px;");
-    mainDiv.append(moveText);
-
-    
-    /*const textAssign = document.createElement('p');
-    textAssign.setAttribute('style', "position: absolute; right:0; top: 267px;font-size:13px;");
-    textAssign.innerHTML = 'Toggle Auto Assign'
-    const buttonAssign = document.createElement('button');
-    buttonAssign.setAttribute('id', "assignButton");
-    buttonAssign.setAttribute('class', "startButton");
-    buttonAssign.setAttribute('style', "position: absolute; right:0; top: 240px;");
-    buttonAssign.innerHTML = 'Disable'
-    buttonAssign.addEventListener("click", enableAutoAssign);
-    mainDiv.append(textAssign);
-    mainDiv.append(buttonAssign);*/
-}
-
-function enableAutoAssign() {
-    const buttonAssign = document.getElementById('assignButton');
-    if (canAutoAssign) {
-        buttonAssign.innerHTML = 'Enable'
-        canAutoAssign = false;
-    }
-    else {
-        buttonAssign.innerHTML = 'Disable'
-        canAutoAssign = true;
-    }
-}
-function newGame() {
-    if (isMoving) return;
-    if (isSelected) return;
-    svgElement.innerHTML = '';
-    document.getElementById('otherFeatures').innerHTML = '';
-    generateGameGeneral();
-}
-//Returns an object representation of the SVG card
-function getCard(element, x, y) {
-    return { 'color': element.getAttribute('color'), 'type': element.getAttribute('suit'), 'num': element.getAttribute('number'), 'x': x, 'y': y };
-}
 function addCard(color, suit, number, dest) {
     holder = document.getElementById(`tableauAreapos${dest}`)
     from = holder;
@@ -352,16 +247,7 @@ function tryAutoAssign() {
         handleAutoMover(true, mover, response, true);
     }
 }
-function undo() {
-    if (isMoving) return;
-    if (isSelected) return;
-    if (gameOver) return;
-    var mover = document.getElementById('mover');
-    const response = controller.handleUndo();
-    if (response['success']) {
-        handleAutoMover(false, mover, response, false);
-    }
-}
+
 function handleAutoMover(cond, mover, response, specifyFrom) {
     isMoving = true
     const cards = response['card'];
@@ -437,6 +323,11 @@ function lerp(a, b, t) {
     return a + (b - a) * t;
 }
 
+//Returns an object representation of the SVG card
+function getCard(element, x, y) {
+    return { 'color': element.getAttribute('color'), 'type': element.getAttribute('suit'), 'num': element.getAttribute('number'), 'x': x, 'y': y };
+}
+
 //Helper function to collect an array of cards from a section, element starting at index start
 function collectCards(element, start) {
     let tempArr = [];
@@ -445,6 +336,36 @@ function collectCards(element, start) {
         tempArr.push(currentCard)
     }
     return tempArr;
+}
+
+export function undo() {
+    if (isMoving) return;
+    if (isSelected) return;
+    if (gameOver) return;
+    var mover = document.getElementById('mover');
+    const response = controller.handleUndo();
+    if (response['success']) {
+        handleAutoMover(false, mover, response, false);
+    }
+}
+
+export function newGame() {
+    if (isMoving) return;
+    if (isSelected) return;
+    svgElement.innerHTML = '';
+    document.getElementById('otherFeatures').innerHTML = '';
+    generateGameGeneral();
+}
+export function enableAutoAssign() {
+    const buttonAssign = document.getElementById('assignButton');
+    if (canAutoAssign) {
+        buttonAssign.innerHTML = 'Enable'
+        canAutoAssign = false;
+    }
+    else {
+        buttonAssign.innerHTML = 'Disable'
+        canAutoAssign = true;
+    }
 }
 
 button.addEventListener("click", generateGame);
