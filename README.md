@@ -16,7 +16,7 @@ To launch the game, go to the root directory of the project (same as the app.js 
 
 ## Limitations and Future Plans
 
-Although the game is fully functional, there are some limitations that I hope to address in the future. These include how cards are inserted into piles; as I stated before, this is based solely on the mouse position and not the overlap between the card and the pile. The movement of cards is slightly rough and could use more polish. Additional features I hope to incorporate into the project are a hint button, a report bug option, and a solver.
+Although the game is fully functional, there are some limitations that I hope to address in the future. These include how cards are inserted into piles; as I stated before, this is based solely on the mouse position and not the overlap between the card and the pile. The movement of cards is slightly rough and could use more polish. The viewport might not be suitable for large stacks. Additional features I hope to incorporate into the project are a hint button, a report bug option, and a solver.
 
 
 
